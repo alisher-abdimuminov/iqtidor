@@ -7,9 +7,9 @@ class PayMeMiddleware:
 
     def __call__(self, request: HttpRequest):
         if (request.path == "/pay/"):
-            try:
+            if request.META.get("HTTP_AUTHORIZATION"):
                 request.META.pop("HTTP_AUTHORIZATION")
-            finally:
+            else:
                 pass
         response = self.get_response(request)
         return response
