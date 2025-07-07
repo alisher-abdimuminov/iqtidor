@@ -76,3 +76,20 @@ class UserEditSerializer(serializers.ModelSerializer):
             "village",
             "school",
         )
+
+
+class SignUpBodySerializer(serializers.Serializer):
+    phone = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    city = serializers.CharField()
+    town = serializers.CharField()
+    village = serializers.CharField()
+    school = serializers.CharField()
+    password = serializers.CharField()
+
+
+class APIResponseSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=["success", "error"])
+    error = serializers.CharField(allow_blank=True)
+    data = serializers.JSONField(allow_null=True)

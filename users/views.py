@@ -1,9 +1,11 @@
+from drf_yasg import openapi
 from django.http import HttpRequest
-from rest_framework.response import Response
 from rest_framework import decorators
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from utils.worker import Worker
 
@@ -13,9 +15,48 @@ from .serializers import (
     UserEditSerializer,
     StudentsSerializer,
     InvitesSerializer,
+
+    SignUpBodySerializer,
+    APIResponseSerializer,
 )
 
 
+signup_errors_enum = openapi.Schema(
+    type=openapi.TYPE_STRING,
+    enum=[
+        "phone_required",
+        "first_name_required",
+        "last_name_required",
+        "city_required",
+        "town_required",
+        "village_required",
+        "school_required",
+        "password_required",
+        "phone_exists",
+    ],
+    description="SignUp xatolik kodlari"
+)
+
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="Login endpoint",
+    request_body=SignUpBodySerializer,
+    responses={
+        200: openapi.Response("OK", APIResponseSerializer),
+        400: openapi.Response(
+            "Xatoliklar",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "status": openapi.Schema(type=openapi.TYPE_STRING, example="error"),
+                    "error": signup_errors_enum,
+                    "data": openapi.Schema(type=openapi.TYPE_OBJECT),
+                }
+            ),
+        )
+    }
+)
 @decorators.api_view(http_method_names=["POST"])
 def signup(request: HttpRequest):
     phone = request.data.get("phone")
