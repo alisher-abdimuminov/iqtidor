@@ -13,6 +13,8 @@ from .views import (
     create_group,
     get_students,
     invite_members,
+
+    payme_callback,
 )
 
 
@@ -29,4 +31,6 @@ urlpatterns = [
     path("teacher/group/create/", create_group),
     path("teacher/students/", get_students),
     path("teacher/group/invite/", invite_members),
+
+    path("payme_callback/", payme_callback),
 ]

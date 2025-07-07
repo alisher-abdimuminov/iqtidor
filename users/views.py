@@ -1,3 +1,5 @@
+import json
+import time
 from drf_yasg import openapi
 from django.http import HttpRequest
 from rest_framework import decorators
@@ -304,3 +306,41 @@ def invite_members(request: HttpRequest):
     )
 
     worker.start()
+
+
+def payme_callback(request: HttpRequest):
+
+    body = json.loads(request.body.decode())
+
+
+    if body.get("method") == "CheckPerformTransaction":
+        return Response({
+            "jsonrpc": "2.0",
+            "id": "1",
+            "result": {
+                "allow": True,
+
+            }
+        })
+    
+    if body.get("method") == "CreateTransaction":
+        return Response({
+            "result": {
+                "create_time": body.get("params").get("time"),
+                "transaction": body.get("params").get("id"),
+                "state": 1,
+            }
+        })
+    
+    if body.get("method") == "PerformTransaction":
+        return Response({
+            "transaction": body.get("params").get("id"),
+            "perform_time": int(time.time()),
+            "state": 2
+        })
+
+    return Response({
+        "result": {
+            
+        }
+    })
