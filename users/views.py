@@ -308,6 +308,7 @@ def invite_members(request: HttpRequest):
     worker.start()
 
 
+@decorators.api_view(http_method_names=["POST"])
 def payme_callback(request: HttpRequest):
 
     body = json.loads(request.body.decode())
