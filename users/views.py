@@ -336,9 +336,11 @@ def payme_callback(request: HttpRequest):
     
     if body.get("method") == "PerformTransaction":
         return Response({
-            "transaction": body.get("params").get("id"),
-            "perform_time": int(time.time()),
-            "state": 2
+            "result": {
+                "transaction": body.get("params").get("id"),
+                "perform_time": int(time.time()),
+                "state": 2
+            }
         })
 
     return Response({
