@@ -11,13 +11,12 @@ from rest_framework.authentication import TokenAuthentication
 
 from utils.worker import Worker
 
-from .models import User, Group, Invite
+from .models import User, Group, Invite, Transaction
 from .serializers import (
     UserSerializer,
     UserEditSerializer,
     StudentsSerializer,
     InvitesSerializer,
-
     SignUpBodySerializer,
     APIResponseSerializer,
 )
@@ -36,7 +35,7 @@ signup_errors_enum = openapi.Schema(
         "password_required",
         "phone_exists",
     ],
-    description="SignUp xatolik kodlari"
+    description="SignUp xatolik kodlari",
 )
 
 
@@ -54,10 +53,10 @@ signup_errors_enum = openapi.Schema(
                     "status": openapi.Schema(type=openapi.TYPE_STRING, example="error"),
                     "error": signup_errors_enum,
                     "data": openapi.Schema(type=openapi.TYPE_OBJECT),
-                }
+                },
             ),
-        )
-    }
+        ),
+    },
 )
 @decorators.api_view(http_method_names=["POST"])
 def signup(request: HttpRequest):
@@ -310,41 +309,89 @@ def invite_members(request: HttpRequest):
 
 @decorators.api_view(http_method_names=["POST"])
 def payme_callback(request: HttpRequest):
+    user: User = None
 
     body = json.loads(request.body.decode())
     print(body)
 
-
     if body.get("method") == "CheckPerformTransaction":
-        return Response({
-            "jsonrpc": "2.0",
-            "id": "1",
-            "result": {
-                "allow": True,
+        account_phone = body.get("params", {}).get("account", {}).get("id", "")
 
+        user = User.objects.filter(phone=account_phone)
+
+        if not user.exists():
+            return Response(
+                {
+                    "error": {
+                        "code": -31050,
+                        "message": {
+                            "uz": "Telefon raqami bog'langan hisob topilmadi. Birinchi ilovadan ro'yxatdan o'ting",
+                        },
+                        "data": "id",
+                    }
+                }
+            )
+
+        user = user.first()
+
+        return Response(
+            {
+                "jsonrpc": "2.0",
+                "id": "1",
+                "result": {
+                    "allow": True,
+                },
             }
-        })
-    
+        )
+
     if body.get("method") == "CreateTransaction":
-        return Response({
-            "result": {
-                "create_time": body.get("params").get("time"),
-                "transaction": body.get("params").get("id"),
-                "state": 1,
-            }
-        })
-    
-    if body.get("method") == "PerformTransaction":
-        return Response({
-            "result": {
-                "transaction": body.get("params").get("id"),
-                "perform_time": int(time.time()),
-                "state": 2
-            }
-        })
+        account_phone = body.get("params", {}).get("account", {}).get("id", "")
+        tid = body.get("params", {}).get("id")
+        amount = body.get("params", {}).get("amount", 1) / 100
 
-    return Response({
-        "result": {
-            
-        }
-    })
+        user = User.objects.filter(phone=account_phone).first()
+        transaction = Transaction.objects.create(
+            author=user, tid=tid, amount=amount, state=1
+        )
+
+        return Response(
+            {
+                "result": {
+                    "create_time": body.get("params").get("time"),
+                    "transaction": transaction.tid,
+                    "state": transaction.state,
+                }
+            }
+        )
+
+    if body.get("method") == "PerformTransaction":
+        tid = body.get("params", {}).get("id")
+
+        transaction = Transaction.objects.filter(tid=tid)
+
+        if not transaction.exists():
+            return Response(
+                {
+                    "error": {
+                        "code": -31003,
+                    }
+                }
+            )
+
+        transaction = transaction.first()
+        transaction.author.balance = transaction.amount
+        transaction.author.save()
+        transaction.state = 2
+        transaction.save()
+
+        return Response(
+            {
+                "result": {
+                    "transaction": tid,
+                    "perform_time": int(time.time()),
+                    "state": 2,
+                }
+            }
+        )
+
+    return Response({})

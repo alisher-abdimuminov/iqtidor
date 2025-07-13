@@ -3,7 +3,7 @@ from unfold.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
-from .models import User
+from .models import User, Transaction
 
 
 @admin.register(User)
@@ -62,3 +62,8 @@ class UserModelAdmin(UserAdmin, ModelAdmin):
             }
         )
     )
+
+
+@admin.register(Transaction)
+class TransactionModelAdmin(ModelAdmin):
+    list_display = ["author", "tid", "amount", "state"]

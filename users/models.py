@@ -10,6 +10,12 @@ ROLE = (
     ("teacher", "O'qituvchi"),
     ("student", "Talaba"),
 )
+PAYME_STATE = (
+    (1, "To'lov yaratildi. Tasdiqlanishi kutilmoqda"),
+    (2, "To'lov amalga muvafaqqiyatli amalga oshirildi"),
+    (-1, "To'lov bekor qilindi"),
+    (-2, "To'lov tugallangandan keyin qaytarildi."),
+)
 
 
 class User(AbstractUser):
@@ -68,4 +74,14 @@ class Invite(models.Model):
 
     def __str__(self):
         return self.student.phone
+    
+class Transaction(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    tid = models.CharField(max_length=100)
+    state = models.IntegerField(choices=PAYME_STATE)
+    amount = models.IntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.tid
 
