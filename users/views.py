@@ -18,45 +18,15 @@ from .serializers import (
     StudentsSerializer,
     InvitesSerializer,
     SignUpBodySerializer,
-    APIResponseSerializer,
-)
-
-
-signup_errors_enum = openapi.Schema(
-    type=openapi.TYPE_STRING,
-    enum=[
-        "phone_required",
-        "first_name_required",
-        "last_name_required",
-        "city_required",
-        "town_required",
-        "village_required",
-        "school_required",
-        "password_required",
-        "phone_exists",
-    ],
-    description="SignUp xatolik kodlari",
+    LoginBodySerializer,
+    EditProfileSerializer,
 )
 
 
 @swagger_auto_schema(
     method="post",
-    operation_description="Login endpoint",
+    operation_description="SignUp endpoint",
     request_body=SignUpBodySerializer,
-    responses={
-        200: openapi.Response("OK", APIResponseSerializer),
-        400: openapi.Response(
-            "Xatoliklar",
-            schema=openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    "status": openapi.Schema(type=openapi.TYPE_STRING, example="error"),
-                    "error": signup_errors_enum,
-                    "data": openapi.Schema(type=openapi.TYPE_OBJECT),
-                },
-            ),
-        ),
-    },
 )
 @decorators.api_view(http_method_names=["POST"])
 def signup(request: HttpRequest):
@@ -131,6 +101,11 @@ def signup(request: HttpRequest):
     return Response({"status": "success", "error": None, "data": None})
 
 
+@swagger_auto_schema(
+    method="post",
+    operation_description="Login endpoint",
+    request_body=LoginBodySerializer,
+)
 @decorators.api_view(http_method_names=["POST"])
 def login(request: HttpRequest):
     phone = request.data.get("phone")
@@ -164,6 +139,12 @@ def login(request: HttpRequest):
     )
 
 
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="Delete account endpoint",
+    request_body=None,
+)
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -173,6 +154,12 @@ def delete(request: HttpRequest):
     return Response({"status": "success", "error": None, "data": None})
 
 
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Profile endpoint",
+    request_body=None,
+)
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -184,6 +171,12 @@ def profile(request: HttpRequest):
     )
 
 
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="Edit profile endpoint",
+    request_body=EditProfileSerializer,
+)
 @decorators.api_view(http_method_names=["POST"])
 def edit_profile(request: HttpRequest):
     user = request.user
@@ -198,6 +191,12 @@ def edit_profile(request: HttpRequest):
     return Response({"status": "error", "error": "fill_empty_fields", "data": None})
 
 
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Get invites list",
+    request_body=None,
+)
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -210,6 +209,17 @@ def get_invites(request: HttpRequest):
     )
 
 
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="Accept invite",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "invite": openapi.Schema(type=openapi.TYPE_INTEGER, description="Invite id/pk")
+        }
+    ),
+)
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -237,7 +247,12 @@ def accept_invite(request: HttpRequest):
 
 # Teacher endpoints
 # get students list
-@decorators.api_view(http_method_names=["POST"])
+@swagger_auto_schema(
+    method="get",
+    operation_description="Get students list for teachers",
+    request_body=None,
+)
+@decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
 def get_students(request: HttpRequest):
@@ -249,6 +264,16 @@ def get_students(request: HttpRequest):
 
 
 # create new group
+@swagger_auto_schema(
+    method="post",
+    operation_description="Create new group for teachers",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Group name")
+        }
+    ),
+)
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -266,6 +291,17 @@ def create_group(request: HttpRequest):
 
 
 # invite members for group
+@swagger_auto_schema(
+    method="post",
+    operation_description="Invite students to group",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "group": openapi.Schema(type=openapi.TYPE_STRING, description="Group id/pk"),
+            "students": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER), description="List of students id"),
+        }
+    ),
+)
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
