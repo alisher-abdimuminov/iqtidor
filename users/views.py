@@ -312,6 +312,7 @@ def invite_members(request: HttpRequest):
 def payme_callback(request: HttpRequest):
 
     body = json.loads(request.body.decode())
+    print(body)
 
 
     if body.get("method") == "CheckPerformTransaction":
