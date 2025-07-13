@@ -9,6 +9,7 @@ from .models import User
 @admin.register(User)
 class UserModelAdmin(UserAdmin, ModelAdmin):
     list_display = ["phone", "first_name", "last_name", "balance", "city", "town", "school"]
+    ordering = ["phone"]
 
     model = User
     form = UserChangeForm

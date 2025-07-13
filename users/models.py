@@ -13,6 +13,7 @@ ROLE = (
 
 
 class User(AbstractUser):
+    username = None
     phone = models.CharField(max_length=100, unique=True, null=False, blank=False, verbose_name="Telefon raqami")
     uuid = models.UUIDField(default=uuid4, editable=False)
 
