@@ -144,6 +144,15 @@ def login(request: HttpRequest):
     method="post",
     operation_description="Delete account endpoint",
     request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -159,6 +168,15 @@ def delete(request: HttpRequest):
     method="get",
     operation_description="Profile endpoint",
     request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -176,6 +194,15 @@ def profile(request: HttpRequest):
     method="post",
     operation_description="Edit profile endpoint",
     request_body=EditProfileSerializer,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["POST"])
 def edit_profile(request: HttpRequest):
@@ -196,6 +223,15 @@ def edit_profile(request: HttpRequest):
     method="get",
     operation_description="Get invites list",
     request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -219,6 +255,15 @@ def get_invites(request: HttpRequest):
             "invite": openapi.Schema(type=openapi.TYPE_INTEGER, description="Invite id/pk")
         }
     ),
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -251,6 +296,15 @@ def accept_invite(request: HttpRequest):
     method="get",
     operation_description="Get students list for teachers",
     request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -273,6 +327,15 @@ def get_students(request: HttpRequest):
             "name": openapi.Schema(type=openapi.TYPE_STRING, description="Group name")
         }
     ),
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -301,6 +364,15 @@ def create_group(request: HttpRequest):
             "students": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER), description="List of students id"),
         }
     ),
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
