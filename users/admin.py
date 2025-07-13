@@ -19,7 +19,7 @@ class UserModelAdmin(UserAdmin, ModelAdmin):
         (
             "Ma'lumotlar", {
                 "fields": (
-                    "phone", "first_name", "last_name",
+                    "phone", "first_name", "last_name", "password1", "password2",
                 )
             }
         ),

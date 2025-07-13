@@ -28,11 +28,11 @@ class User(AbstractUser):
 
     city = models.CharField(max_length=100, null=True, blank=True, verbose_name="Viloyat")
     town = models.CharField(max_length=100, null=True, blank=True, verbose_name="Tuman")
-    village = models.CharField(max_length=100, null=True, verbose_name="Qishloq")
+    village = models.CharField(max_length=100, null=True, blank=True, verbose_name="Qishloq")
     school = models.CharField(max_length=100, null=True, blank=True, verbose_name="Maktab")
 
     role = models.CharField(max_length=100, choices=ROLE, verbose_name="Role")
-    image = models.ImageField(upload_to="images/users", verbose_name="Rasm")
+    image = models.ImageField(upload_to="images/users", verbose_name="Rasm", null=True, blank=True)
     balance = models.IntegerField(default=0, verbose_name="Balans")
 
     created = models.DateTimeField(auto_now_add=True)
