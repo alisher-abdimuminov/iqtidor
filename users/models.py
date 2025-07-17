@@ -64,6 +64,10 @@ class Group(models.Model):
     def count_members(self):
         return self.members.count()
     
+    class Meta:
+        verbose_name = "Guruh"
+        verbose_name_plural = "Guruhlar"
+    
 
 class Invite(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -75,6 +79,11 @@ class Invite(models.Model):
     def __str__(self):
         return self.student.phone
     
+    class Meta:
+        verbose_name = "Taklif"
+        verbose_name_plural = "Takliflar"
+
+    
 class Transaction(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     tid = models.CharField(max_length=100)
@@ -84,4 +93,8 @@ class Transaction(models.Model):
 
     def __str__(self):
         return self.tid
+    
+    class Meta:
+        verbose_name = "To'lov"
+        verbose_name_plural = "To'lovlar"
 
