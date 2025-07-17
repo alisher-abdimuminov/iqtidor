@@ -14,13 +14,14 @@ schema_view = get_schema_view(
         description="Ukam kayp qi",
     ),
     public=False,
-    permission_classes=[permissions.IsAuthenticated],
+    permission_classes=[permissions.IsAdminUser],
 )
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("users.urls")),
+    path("api/v1/", include("tests.urls")),
     path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger"),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc"),
 ]

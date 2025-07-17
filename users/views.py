@@ -415,6 +415,8 @@ def invite_members(request: HttpRequest):
     worker.start()
 
 
+# PayMe callback handler for payments
+@swagger_auto_schema(method="post", auto_schema=None)
 @decorators.api_view(http_method_names=["POST"])
 def payme_callback(request: HttpRequest):
     user: User = None
