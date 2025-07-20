@@ -24,9 +24,9 @@ class InvitesSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    group = serializers.SerializerMethodField()
+    group = serializers.SerializerMethodField("get_group")
 
-    def group_func(self, obj: User):
+    def get_group(self, obj: User):
         group = Group.objects.filter(members=obj)
 
         if not group.exists():
