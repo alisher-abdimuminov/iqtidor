@@ -8,11 +8,14 @@ from .views import (
     get_cefr,
     join_cefr,
     SubjectsListAPIView,
+    BannersListAPIView,
 )
 
 
 urlpatterns = [
     path("subjects/", SubjectsListAPIView.as_view()),
+    path("banners/", BannersListAPIView.as_view()),
+
     path("dtms/", DtmsListAPIView.as_view()),
     path("dtms/dtm/<int:pk>/", get_dtm),
     path("dtms/dtm/<int:pk>/join/", join_dtm),

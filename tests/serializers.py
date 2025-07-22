@@ -11,7 +11,14 @@ from .models import (
     Cefr,
     Question,
     QuestionAnswer,
+    Banner,
 )
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = ("id", "image", "dtm", "cefr", "is_active", )
 
 
 class SubjectSerializer(serializers.ModelSerializer):

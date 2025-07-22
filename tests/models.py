@@ -13,31 +13,35 @@ TEST_TYPE = (
 
 class Subject(models.Model):
     name = models.CharField()
-    
+
     def __str__(self):
         return self.name
-    
+
     def count_cefrs(self):
         return Cefr.objects.filter(subject=self).count()
-    
+
     class Meta:
         verbose_name = "Fan"
         verbose_name_plural = "Fanlar"
 
+
 # dtm
+
 
 class Dtm(models.Model):
     name = models.CharField(max_length=100)
-    participants = models.ManyToManyField(User, related_name="dtm_participants", blank=True)
+    participants = models.ManyToManyField(
+        User, related_name="dtm_participants", blank=True
+    )
     is_public = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField()
-    ended = models.DateTimeField()  
+    ended = models.DateTimeField()
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = "DTM"
         verbose_name_plural = "DTM lar"
@@ -50,11 +54,11 @@ class Block(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = "DTM blok"
         verbose_name_plural = "DTM bloklar"
-    
+
 
 class Test(models.Model):
     question = models.TextField()
@@ -64,7 +68,7 @@ class Test(models.Model):
 
     def __str__(self):
         return self.question
-    
+
     class Meta:
         verbose_name = "DTM test"
         verbose_name_plural = "DTM testlar"
@@ -79,7 +83,7 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.test.question
-    
+
     class Meta:
         verbose_name = "DTM test javob"
         verbose_name_plural = "DTM test javoblari"
@@ -89,16 +93,18 @@ class Answer(models.Model):
 class Cefr(models.Model):
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    participants = models.ManyToManyField(User, related_name="cefr_participants", blank=True)
+    participants = models.ManyToManyField(
+        User, related_name="cefr_participants", blank=True
+    )
     is_public = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField()
-    ended = models.DateTimeField()  
+    ended = models.DateTimeField()
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = "CEFR"
         verbose_name_plural = "CEFR lar"
@@ -112,7 +118,7 @@ class Question(models.Model):
 
     def __str__(self):
         return self.question
-    
+
     class Meta:
         verbose_name = "CEFR savoli"
         verbose_name_plural = "CEFR savollari"
@@ -127,7 +133,22 @@ class QuestionAnswer(models.Model):
 
     def __str__(self):
         return self.question.question
-    
+
     class Meta:
         verbose_name = "CEFR savoli javobi"
         verbose_name_plural = "CEFR savoli javoblari"
+
+
+class Banner(models.Model):
+    description = models.TextField(null=True, blank=True)
+    dtm = models.ForeignKey(
+        Dtm, on_delete=models.SET_NULL, default=None, null=True, blank=True
+    )
+    cefr = models.ForeignKey(
+        Cefr, on_delete=models.SET_NULL, default=None, null=True, blank=True
+    )
+    image = models.ImageField(upload_to="images/banners", null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.description)
