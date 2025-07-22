@@ -7,10 +7,12 @@ from .views import (
     CefrListAPIView,
     get_cefr,
     join_cefr,
+    SubjectsListAPIView,
 )
 
 
 urlpatterns = [
+    path("subjects/", SubjectsListAPIView.as_view()),
     path("dtms/", DtmsListAPIView.as_view()),
     path("dtms/dtm/<int:pk>/", get_dtm),
     path("dtms/dtm/<int:pk>/join/", join_dtm),
