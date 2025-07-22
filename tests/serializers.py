@@ -17,7 +17,7 @@ from .models import (
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ("id", "name", )
+        fields = ("id", "name", "count_cefrs", )
 
 
 class AnswerSerializerer(serializers.ModelSerializer):

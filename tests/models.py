@@ -17,6 +17,9 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
     
+    def count_cefrs(self):
+        return Cefr.objects.filter(subject=self).count()
+    
     class Meta:
         verbose_name = "Fan"
         verbose_name_plural = "Fanlar"

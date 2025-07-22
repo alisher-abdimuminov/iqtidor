@@ -7,13 +7,21 @@ from rest_framework import generics
 from .models import (
     Dtm,
     Cefr,
+    Subject,
 )
 from .serializers import (
     DtmsSerializer,
     DtmSerializer,
     CefrSerializer,
     CefrsSerializer,
+    SubjectSerializer,
 )
+
+
+class SubjectsListAPIView(generics.ListAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+
 
 class DtmsListAPIView(generics.ListAPIView):
     queryset = Dtm.objects.all()
