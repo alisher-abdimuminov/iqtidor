@@ -22,6 +22,15 @@ class SubjectsListAPIView(generics.ListAPIView):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response.data.append({
+            "id": 0,
+            "name": "dtm",
+            "count_dtms": Dtm.objects.count()
+        })
+        return response
+
 
 class DtmsListAPIView(generics.ListAPIView):
     queryset = Dtm.objects.all()
