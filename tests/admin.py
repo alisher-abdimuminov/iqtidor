@@ -12,6 +12,7 @@ from .models import (
     Cefr,
     Question,
     QuestionAnswer,
+    Banner,
 )
 
 
@@ -62,3 +63,8 @@ class CefrModelAdmin(ModelAdmin):
 class QuestionModelAdmin(ModelAdmin):
     list_display = ["cefr", "type",]
     inlines = [QuestionAnswerInline]
+
+
+@admin.action(Banner)
+class BannerModelAdmin(ModelAdmin):
+    list_display = ["description", "dtm", "cefr"]
