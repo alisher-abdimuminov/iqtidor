@@ -65,6 +65,6 @@ class QuestionModelAdmin(ModelAdmin):
     inlines = [QuestionAnswerInline]
 
 
-@admin.action(Banner)
+@admin.register(Banner)
 class BannerModelAdmin(ModelAdmin):
     list_display = ["description", "dtm", "cefr"]
