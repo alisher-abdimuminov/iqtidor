@@ -12,6 +12,8 @@ from .models import (
     Question,
     QuestionAnswer,
     Banner,
+    DTMResult,
+    CEFRResult,
 )
 
 
@@ -141,3 +143,26 @@ class CefrsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cefr
         fields = ("id", "name", "created", "started", "ended", "is_open", "is_public", )
+
+
+class DTMResultSerializer(serializers.ModelSerializer):
+    dtm = DtmsSerializer()
+    class Meta:
+        model = DTMResult
+        fields = (
+            "dtm",
+            "points",
+            "status",
+        )
+
+
+class CEFRResultSerializer(serializers.ModelSerializer):
+    cefr = CefrsSerializer()
+    class Meta:
+        model = CEFRResult
+        fields = (
+            "cefr",
+            "points",
+            "degree",
+            "status",
+        )

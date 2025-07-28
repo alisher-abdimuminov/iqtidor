@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import User
+from users.models import User, Group
 
 
 TEST_TYPE = (
@@ -8,6 +8,22 @@ TEST_TYPE = (
     ("multiple", "Ko'p javob tanlanadigan"),
     ("matchable", "Moslashtiriladigan"),
     ("writable", "Javob yoziladigan"),
+)
+RESULT_TYPE = (
+    ("failed", "Yiqilgan"),
+    ("passed", "O'tgan")
+)
+CEFR_DEGREE_TYPE = (
+    ("a", "A"),
+    ("a+", "A+"),
+    ("b", "B"),
+    ("b+", "B+"),
+    ("c", "C"),
+    ("c+", "C+"),
+    ("d", "D"),
+    ("d+", "D+"),
+    ("f", "F"),
+    ("f+", "F+"),
 )
 
 
@@ -30,10 +46,12 @@ class Subject(models.Model):
 
 class Dtm(models.Model):
     name = models.CharField(max_length=100)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     participants = models.ManyToManyField(
         User, related_name="dtm_participants", blank=True
     )
     is_public = models.BooleanField(default=False)
+    passing_score = models.DecimalField(max_digits=10, decimal_places=2)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField()
@@ -93,10 +111,12 @@ class Answer(models.Model):
 class Cefr(models.Model):
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     participants = models.ManyToManyField(
         User, related_name="cefr_participants", blank=True
     )
     is_public = models.BooleanField(default=False)
+    passing_score = models.DecimalField(max_digits=10, decimal_places=2)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField()
@@ -152,3 +172,32 @@ class Banner(models.Model):
 
     def __str__(self):
         return str(self.description)
+    
+
+class DTMResult(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    dtm = models.ForeignKey(Dtm, on_delete=models.CASCADE)
+    cases = models.JSONField(default=dict)
+    points = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=10, choices=RESULT_TYPE)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.status
+    
+
+class CEFRResult(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
+    cases = models.JSONField(default=dict)
+    points = models.DecimalField(max_digits=10, decimal_places=2)
+    degree = models.CharField(max_length=5, choices=CEFR_DEGREE_TYPE)
+    status = models.CharField(max_length=10, choices=RESULT_TYPE)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.status

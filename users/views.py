@@ -205,6 +205,8 @@ def profile(request: HttpRequest):
     ]
 )
 @decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
 def edit_profile(request: HttpRequest):
     user = request.user
     data = request.data

@@ -9,6 +9,7 @@ from .views import (
     join_cefr,
     SubjectsListAPIView,
     BannersListAPIView,
+    get_statistics,
 )
 
 
@@ -23,4 +24,6 @@ urlpatterns = [
     path("cefrs/", CefrListAPIView.as_view()),
     path("cefrs/cefr/<int:pk>/", get_cefr),
     path("cefrs/cefr/<int:pk>/join/", join_cefr),
+
+    path("statistics/", get_statistics),
 ]

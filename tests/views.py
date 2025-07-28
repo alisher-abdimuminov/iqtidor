@@ -1,7 +1,12 @@
+from datetime import datetime, timedelta
 from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework import decorators
 from rest_framework import generics
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 from .models import (
@@ -9,6 +14,8 @@ from .models import (
     Cefr,
     Subject,
     Banner,
+    DTMResult,
+    CEFRResult,
 )
 from .serializers import (
     DtmsSerializer,
@@ -17,6 +24,8 @@ from .serializers import (
     CefrsSerializer,
     SubjectSerializer,
     BannerSerializer,
+    DTMResultSerializer,
+    CEFRResultSerializer,
 )
 
 
@@ -120,3 +129,66 @@ def join_cefr(request: HttpRequest, pk):
     cefr_obj.save()
 
     return Response({"status": "success", "error": None, "data": None})
+
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Get statistics",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
+)
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def get_statistics(request: HttpRequest):
+    user = request.user
+    now = datetime.now()
+    filter_by = request.GET.get("filter_by")
+
+    start_of_week = now - timedelta(days=now.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+
+    dtms = DTMResult.objects.all()
+
+    if filter_by == "monthly":
+        dtms = DTMResult.objects.filter(
+            created__year=now.year, created__month=now.month
+        )
+    elif filter_by == "weekly":
+        dtms = DTMResult.objects.filter(
+            created__date__gte=start_of_week.date(),
+            created__date__lte=end_of_week.date(),
+        )
+
+
+    cefrs = CEFRResult.objects.all()
+
+    if filter_by == "monthly":
+        cefrs = CEFRResult.objects.filter(
+            created__year=now.year, created__month=now.month
+        )
+    elif filter_by == "weekly":
+        cefrs = CEFRResult.objects.filter(
+            created__date__gte=start_of_week.date(),
+            created__date__lte=end_of_week.date(),
+        )
+
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": {
+            "dtms": dtms.count(),
+            "passed_dtms": dtms.filter(status="passed").count(),
+            "cefrs": cefrs.count(),
+            "passed_cefrs": cefrs.filter(status="passed").count(),
+        }
+    })
