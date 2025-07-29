@@ -341,3 +341,119 @@ def search(request: HttpRequest, search: str):
             "cefrs": CefrsSerializer(cefr, many=True, context={ "request": request }).data
         }
     })
+
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="DTM natijalarin saqlash",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def save_dtm_result(request: HttpRequest, pk: int):
+    user: User = request.user
+    points = request.data.get("points", 0)
+    status = "failed"
+    cases = request.data.get("cases")
+    dtm = Dtm.objects.filter(pk=pk)
+
+    if not dtm:
+        return Response({
+            "status": "error",
+            "error": "dtm_not_found",
+            "data": None
+        })
+    
+    dtm = dtm.first()
+
+    dtm_result = DTMResult.objects.filter(author=user, dtm=dtm)
+
+    if dtm_result:
+        return Response({
+            "status": "error",
+            "error": "dtm_already_solved",
+            "data": None
+        })
+
+    if points < dtm.passing_score:
+        status = "passed"
+
+    DTMResult.objects.create(
+        author=user,
+        dtm=dtm,
+        cases=cases,
+        points=points,
+        status=status,
+    )
+
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": None
+    })
+
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="DTM natijalarin saqlash",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def save_cefr_result(request: HttpRequest, pk: int):
+    user: User = request.user
+    cases = request.data.get("cases")
+    cefr = Cefr.objects.filter(pk=pk)
+
+    if not cefr:
+        return Response({
+            "status": "error",
+            "error": "cefr_not_found",
+            "data": None
+        })
+    
+    cefr = cefr.first()
+
+    cefr_result = CEFRResult.objects.filter(author=user, cefr=cefr)
+
+    if cefr_result:
+        return Response({
+            "status": "error",
+            "error": "cefr_already_solved",
+            "data": None
+        })
+
+    CEFRResult.objects.create(
+        author=user,
+        cefr=cefr,
+        cases=cases,
+    )
+
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": None
+    })
+
+
+

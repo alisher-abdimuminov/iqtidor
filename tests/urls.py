@@ -11,6 +11,8 @@ from .views import (
     purchase_cefr,
     purchase_dtm,
     search,
+    save_dtm_result,
+    save_cefr_result,
 )
 
 
@@ -21,10 +23,12 @@ urlpatterns = [
     path("dtms/", DtmsListAPIView.as_view()),
     path("dtms/dtm/<int:pk>/", get_dtm),
     path("dtms/dtm/<int:pk>/purchase/", purchase_dtm),
+    path("dtms/dtm/<int:pk>/save/", save_dtm_result),
 
     path("cefrs/", CefrListAPIView.as_view()),
     path("cefrs/cefr/<int:pk>/", get_cefr),
     path("cefrs/cefr/<int:pk>/purchase/", purchase_cefr),
+    path("cefrs/cefr/<int:pk>/save/", save_cefr_result),
 
     path("statistics/", get_statistics),
     path("search/<str:search>/", search),

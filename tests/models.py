@@ -24,6 +24,7 @@ CEFR_DEGREE_TYPE = (
     ("d+", "D+"),
     ("f", "F"),
     ("f+", "F+"),
+    ("nc", "Hisoblanmagan"),
 )
 
 
@@ -194,9 +195,9 @@ class CEFRResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
-    points = models.DecimalField(max_digits=10, decimal_places=2)
-    degree = models.CharField(max_length=5, choices=CEFR_DEGREE_TYPE)
-    status = models.CharField(max_length=10, choices=RESULT_TYPE)
+    points = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    degree = models.CharField(max_length=5, choices=CEFR_DEGREE_TYPE, default="nc")
+    status = models.CharField(max_length=10, choices=RESULT_TYPE, null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
