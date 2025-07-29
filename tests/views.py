@@ -457,7 +457,7 @@ def save_cefr_result(request: HttpRequest, pk: int):
 
 
 @swagger_auto_schema(
-    method="post",
+    method="get",
     operation_description="Mening imtihonlarim",
     request_body=None,
     manual_parameters=[
@@ -470,7 +470,7 @@ def save_cefr_result(request: HttpRequest, pk: int):
         )
     ],
 )
-@decorators.api_view(http_method_names=["POST"])
+@decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
 def my_tests(request: HttpRequest):
