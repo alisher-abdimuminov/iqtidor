@@ -50,6 +50,7 @@ class Dtm(models.Model):
     participants = models.ManyToManyField(
         User, related_name="dtm_participants", blank=True
     )
+    price = models.IntegerField(default=0)
     is_public = models.BooleanField(default=False)
     passing_score = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -112,6 +113,7 @@ class Cefr(models.Model):
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    price = models.IntegerField(default=0)
     participants = models.ManyToManyField(
         User, related_name="cefr_participants", blank=True
     )

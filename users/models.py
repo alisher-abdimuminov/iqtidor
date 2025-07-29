@@ -52,6 +52,7 @@ class User(AbstractUser):
 class Group(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    price = models.IntegerField(default=0)
     members = models.ManyToManyField(User, related_name="group_users", blank=True)
     max_members = models.IntegerField(default=10)
 

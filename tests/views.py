@@ -8,6 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+from users.models import User
 
 from .models import (
     Dtm,
@@ -81,6 +82,43 @@ def get_dtm(request: HttpRequest, pk: int):
     )
 
 
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def purchase_dtm(request: HttpRequest, pk: int):
+    user: User = request.user
+    dtm_obj = Dtm.objects.filter(pk=pk)
+
+    if not dtm_obj.exists():
+        return Response(
+            {"status": "error", "error": "dtm_not_found", "data": None}, status=404
+        )
+
+    dtm_obj = dtm_obj.first()
+
+    if dtm_obj.group:
+        return Response({
+            "status": "error",
+            "error": "dtm_for_group",
+            "data": None
+        })
+
+    if not dtm_obj.is_public and user not in dtm_obj.participants.all():
+        user.balance = user.balance - dtm_obj.price
+        user.save()
+        return Response({
+            "status": "success",
+            "error": None,
+            "data": None
+        })
+    
+    return Response({
+        "status": "error",
+        "error": "dtm_is_public_or_purchased",
+        "data": None
+    })
+
+
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -105,6 +143,7 @@ class CefrListAPIView(generics.ListAPIView):
     queryset = Cefr.objects.all()
     serializer_class = CefrsSerializer
     
+    
 
 
 @decorators.api_view(http_method_names=["GET"])
@@ -127,6 +166,44 @@ def get_cefr(request: HttpRequest, pk: int):
             "data": {**CefrSerializer(cefr_obj, context={"request": request}).data},
         }
     )
+
+
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def purchase_cefr(request: HttpRequest, pk: int):
+    user: User = request.user
+    cefr_obj = Cefr.objects.filter(pk=pk)
+
+    if not cefr_obj.exists():
+        return Response(
+            {"status": "error", "error": "cefr_not_found", "data": None}, status=404
+        )
+
+    cefr_obj = cefr_obj.first()
+
+    if cefr_obj.group:
+        return Response({
+            "status": "error",
+            "error": "cefr_for_group",
+            "data": None
+        })
+
+    if not cefr_obj.is_public and user not in cefr_obj.participants.all():
+        user.balance = user.balance - cefr_obj.price
+        user.save()
+        return Response({
+            "status": "success",
+            "error": None,
+            "data": None
+        })
+    
+    return Response({
+        "status": "error",
+        "error": "cefr_is_public_or_purchased",
+        "data": None
+    })
+
 
 
 @decorators.api_view(http_method_names=["POST"])

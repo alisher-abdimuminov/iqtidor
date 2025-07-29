@@ -10,6 +10,7 @@ class GroupSerializer(serializers.ModelSerializer):
             "id",
             "teacher",
             "name",
+            "price",
             "count_members",
             "max_members",
             "created",
