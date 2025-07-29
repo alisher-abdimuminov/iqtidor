@@ -51,7 +51,7 @@ class SubjectsListAPIView(generics.ListAPIView):
 
 
 class DtmsListAPIView(generics.ListAPIView):
-    queryset = Dtm.objects.all()
+    queryset = Dtm.objects.filter(group=None)
     serializer_class = DtmsSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -150,7 +150,7 @@ def purchase_dtm(request: HttpRequest, pk: int):
 
 # cefr
 class CefrListAPIView(generics.ListAPIView):
-    queryset = Cefr.objects.all()
+    queryset = Cefr.objects.filter(group=None)
     serializer_class = CefrsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["subject"]
