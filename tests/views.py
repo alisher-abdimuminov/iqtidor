@@ -32,11 +32,15 @@ from .serializers import (
 class BannersListAPIView(generics.ListAPIView):
     queryset = Banner.objects.all()
     serializer_class = BannerSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
 
 class SubjectsListAPIView(generics.ListAPIView):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
@@ -49,6 +53,8 @@ class SubjectsListAPIView(generics.ListAPIView):
 class DtmsListAPIView(generics.ListAPIView):
     queryset = Dtm.objects.all()
     serializer_class = DtmsSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
 
 @swagger_auto_schema(
@@ -148,6 +154,8 @@ class CefrListAPIView(generics.ListAPIView):
     serializer_class = CefrsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["subject"]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
 
 @swagger_auto_schema(
