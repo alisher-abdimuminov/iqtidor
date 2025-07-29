@@ -286,10 +286,19 @@ def accept_invite(request: HttpRequest):
 
     invite = invite.first()
 
-    invite.group.members.add(user)
-    invite.group.save()
+    if invite.group.price <= invite.student.balance:
+        invite.group.members.add(user)
+        invite.student.balance = invite.student.balance - invite.group.price
+        invite.student.save()
+        invite.group.save()
 
-    return Response({"status": "success", "error": None, "data": None})
+        return Response({"status": "success", "error": None, "data": None})
+    else:
+        return Response({
+            "status": "error",
+            "error": "balance_is_not_enough",
+            "data": None
+        })
 
 
 # Teacher endpoints

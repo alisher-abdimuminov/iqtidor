@@ -327,9 +327,12 @@ def get_statistics(request: HttpRequest):
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
 def search(request: HttpRequest, search: str):
-    print(search)
+    search = search.strip()
     dtms = Dtm.objects.filter(name__icontains=search)
     cefr = Cefr.objects.filter(name__icontains=search)
+    print(search)
+    print(dtms.count())
+    print(cefr.count())
     return Response({
         "status": "success",
         "error": None,
