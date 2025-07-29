@@ -13,6 +13,7 @@ from .views import (
     search,
     save_dtm_result,
     save_cefr_result,
+    my_tests,
 )
 
 
@@ -32,4 +33,6 @@ urlpatterns = [
 
     path("statistics/", get_statistics),
     path("search/<str:search>/", search),
+
+    path("my/", my_tests),
 ]

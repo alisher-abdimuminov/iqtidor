@@ -456,4 +456,36 @@ def save_cefr_result(request: HttpRequest, pk: int):
     })
 
 
+@swagger_auto_schema(
+    method="post",
+    operation_description="Mening imtihonlarim",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def my_tests(request: HttpRequest):
+    user: User = request.user
+
+    dtms = Dtm.objects.filter(participants=user)
+    cefrs = Cefr.objects.filter(participants=user)
+
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": {
+            "dtms": DtmsSerializer(dtms, many=True, context={ "request": request }).data,
+            "cefrs": CefrsSerializer(cefrs, many=True, context={ "request": request }).data
+        }
+    })
+
 
