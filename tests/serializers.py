@@ -63,6 +63,7 @@ class BlockSerializer(serializers.ModelSerializer):
 class DtmSerializer(serializers.ModelSerializer):
     blocks = serializers.SerializerMethodField("get_blocks")
     is_open = serializers.SerializerMethodField("get_is_open")
+    is_solved = serializers.SerializerMethodField("get_is_solved")
 
     def get_blocks(self, obj: Dtm):
         blocks = Block.objects.filter(dtm=obj)
@@ -74,24 +75,41 @@ class DtmSerializer(serializers.ModelSerializer):
             return True
         return False
     
+    def get_is_solved(self, obj: Dtm):
+        request: HttpRequest = self.context.get("request")
+        dtm_result = DTMResult.objects.filter(author=request.user, dtm=obj)
+
+        if dtm_result:
+            return True
+        return False
+    
     class Meta:
         model = Dtm
-        fields = ("id", "name", "created", "started", "ended", "blocks", "is_open", "is_public", )
+        fields = ("id", "name", "price", "created", "started", "ended", "blocks", "is_open", "is_solved", "is_public", )
 
 
 
 class DtmsSerializer(serializers.ModelSerializer):
     is_open = serializers.SerializerMethodField("get_is_open")
+    is_solved = serializers.SerializerMethodField("get_is_solved")
 
     def get_is_open(self, obj: Dtm):
         request: HttpRequest = self.context.get("request")
         if obj.participants.all().contains(request.user):
             return True
         return False
-        
+    
+    def get_is_solved(self, obj: Dtm):
+        request: HttpRequest = self.context.get("request")
+        dtm_result = DTMResult.objects.filter(author=request.user, dtm=obj)
+
+        if dtm_result:
+            return True
+        return False
+
     class Meta:
         model = Dtm
-        fields = ("id", "name", "created", "started", "ended", "is_open", "is_public", )
+        fields = ("id", "name", "price", "created", "started", "ended", "is_open", "is_solved", "is_public", )
 
 # cefr
 class QuestionAnswerSerializerer(serializers.ModelSerializer):
@@ -115,6 +133,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 class CefrSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField("get_questions")
     is_open = serializers.SerializerMethodField("get_is_open")
+    is_solved = serializers.SerializerMethodField("get_is_solved")
 
     def get_questions(self, obj: Cefr):
         questions = Question.objects.filter(cefr=obj)
@@ -126,23 +145,40 @@ class CefrSerializer(serializers.ModelSerializer):
             return True
         return False
     
+    def get_is_solved(self, obj: Cefr):
+        request: HttpRequest = self.context.get("request")
+        cefr_result = CEFRResult.objects.filter(author=request.user, cefr=obj)
+
+        if cefr_result:
+            return True
+        return False
+    
     class Meta:
         model = Dtm
-        fields = ("id", "name", "created", "started", "ended", "questions", "is_open", "is_public", )
+        fields = ("id", "name", "created", "started", "ended", "questions", "is_open", "is_solved", "is_public", )
 
 
 class CefrsSerializer(serializers.ModelSerializer):
     is_open = serializers.SerializerMethodField("get_is_open")
+    is_solved = serializers.SerializerMethodField("get_is_solved")
 
     def get_is_open(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
         if obj.participants.all().contains(request.user):
             return True
         return False
+    
+    def get_is_solved(self, obj: Cefr):
+        request: HttpRequest = self.context.get("request")
+        cefr_result = CEFRResult.objects.filter(author=request.user, cefr=obj)
+
+        if cefr_result:
+            return True
+        return False
         
     class Meta:
         model = Cefr
-        fields = ("id", "subject", "name", "created", "started", "ended", "is_open", "is_public", )
+        fields = ("id", "subject", "name", "created", "started", "ended", "is_open", "is_solved", "is_public", )
 
 
 class DTMResultSerializer(serializers.ModelSerializer):
