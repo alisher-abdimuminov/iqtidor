@@ -333,7 +333,7 @@ def search(request: HttpRequest, search: str):
         "status": "success",
         "error": None,
         "data": {
-            "dtms": DtmsSerializer(dtms, many=True).data,
-            "cefrs": CefrsSerializer(cefr, many=True).data
+            "dtms": DtmsSerializer(dtms, many=True, context={ "request": request }).data,
+            "cefrs": CefrsSerializer(cefr, many=True, context={ "request": request }).data
         }
     })
