@@ -51,6 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
             "role",
             "group",
             "balance",
+            "image",
         )
 
 
@@ -75,6 +76,7 @@ class UserEditSerializer(serializers.ModelSerializer):
             "town",
             "village",
             "school",
+            "image",
         )
 
 
