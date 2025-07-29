@@ -52,7 +52,10 @@ class DtmsListAPIView(generics.ListAPIView):
 
 
 @decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
 def get_dtm(request: HttpRequest, pk: int):
+    user = request.user
     dtm_obj = Dtm.objects.filter(pk=pk)
 
     if not dtm_obj.exists():
@@ -61,6 +64,13 @@ def get_dtm(request: HttpRequest, pk: int):
         )
 
     dtm_obj = dtm_obj.first()
+
+    if not dtm_obj.is_public and user not in dtm_obj.participants.all():
+        return Response({
+            "status": "error",
+            "error": "dtm_is_private",
+            "data": None
+        })
 
     return Response(
         {
@@ -72,6 +82,8 @@ def get_dtm(request: HttpRequest, pk: int):
 
 
 @decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
 def join_dtm(request: HttpRequest, pk):
     dtm_obj = Dtm.objects.filter(pk=pk)
 
@@ -92,9 +104,12 @@ def join_dtm(request: HttpRequest, pk):
 class CefrListAPIView(generics.ListAPIView):
     queryset = Cefr.objects.all()
     serializer_class = CefrsSerializer
+    
 
 
 @decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
 def get_cefr(request: HttpRequest, pk: int):
     cefr_obj = Cefr.objects.filter(pk=pk)
 
@@ -115,6 +130,8 @@ def get_cefr(request: HttpRequest, pk: int):
 
 
 @decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
 def join_cefr(request: HttpRequest, pk):
     cefr_obj = Cefr.objects.filter(pk=pk)
 
