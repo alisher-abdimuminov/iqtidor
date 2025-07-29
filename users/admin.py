@@ -10,6 +10,8 @@ from .models import User, Transaction, Invite, Group
 class UserModelAdmin(UserAdmin, ModelAdmin):
     list_display = ["phone", "first_name", "last_name", "balance", "city", "town", "school"]
     ordering = ["phone"]
+    list_filter = ["city", "town", ]
+    search_fields = ["phone", "first_name", "last_name", ]
 
     model = User
     form = UserChangeForm

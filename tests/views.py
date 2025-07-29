@@ -307,3 +307,33 @@ def get_statistics(request: HttpRequest):
             },
         }
     )
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Search",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def search(request: HttpRequest, search: str):
+    dtms = Dtm.objects.filter(name__icontains=search)
+    cefr = Cefr.objects.filter(name__icontains=search)
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": {
+            "dtms": DtmsSerializer(dtms, many=True).data,
+            "cefrs": CefrsSerializer(cefr, many=True).data
+        }
+    })

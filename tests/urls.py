@@ -10,6 +10,7 @@ from .views import (
     get_statistics,
     purchase_cefr,
     purchase_dtm,
+    search,
 )
 
 
@@ -26,4 +27,5 @@ urlpatterns = [
     path("cefrs/cefr/<int:pk>/purchase/", purchase_cefr),
 
     path("statistics/", get_statistics),
+    path("search/<str:search>/", search),
 ]
