@@ -142,7 +142,7 @@ class CefrsSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Cefr
-        fields = ("id", "name", "created", "started", "ended", "is_open", "is_public", )
+        fields = ("id", "subject", "name", "created", "started", "ended", "is_open", "is_public", )
 
 
 class DTMResultSerializer(serializers.ModelSerializer):

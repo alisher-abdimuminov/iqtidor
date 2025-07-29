@@ -1,12 +1,13 @@
-from datetime import datetime, timedelta
-from django.http import HttpRequest
-from rest_framework.response import Response
-from rest_framework import decorators
-from rest_framework import generics
 from drf_yasg import openapi
+from rest_framework import generics
+from django.http import HttpRequest
+from rest_framework import decorators
+from datetime import datetime, timedelta
+from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.authentication import TokenAuthentication
 
 from users.models import User
 
@@ -25,8 +26,6 @@ from .serializers import (
     CefrsSerializer,
     SubjectSerializer,
     BannerSerializer,
-    DTMResultSerializer,
-    CEFRResultSerializer,
 )
 
 
@@ -52,6 +51,20 @@ class DtmsListAPIView(generics.ListAPIView):
     serializer_class = DtmsSerializer
 
 
+@swagger_auto_schema(
+    method="get",
+    operation_description="DTM ni olish",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -67,11 +80,7 @@ def get_dtm(request: HttpRequest, pk: int):
     dtm_obj = dtm_obj.first()
 
     if not dtm_obj.is_public and user not in dtm_obj.participants.all():
-        return Response({
-            "status": "error",
-            "error": "dtm_is_private",
-            "data": None
-        })
+        return Response({"status": "error", "error": "dtm_is_private", "data": None})
 
     return Response(
         {
@@ -82,7 +91,21 @@ def get_dtm(request: HttpRequest, pk: int):
     )
 
 
-@decorators.api_view(http_method_names=["GET"])
+@swagger_auto_schema(
+    method="post",
+    operation_description="DTM ni sotib olish",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
 def purchase_dtm(request: HttpRequest, pk: int):
@@ -97,55 +120,50 @@ def purchase_dtm(request: HttpRequest, pk: int):
     dtm_obj = dtm_obj.first()
 
     if dtm_obj.group:
-        return Response({
-            "status": "error",
-            "error": "dtm_for_group",
-            "data": None
-        })
+        return Response({"status": "error", "error": "dtm_for_group", "data": None})
 
-    if not dtm_obj.is_public and user not in dtm_obj.participants.all():
-        user.balance = user.balance - dtm_obj.price
-        user.save()
-        return Response({
-            "status": "success",
-            "error": None,
-            "data": None
-        })
-    
-    return Response({
-        "status": "error",
-        "error": "dtm_is_public_or_purchased",
-        "data": None
-    })
+    if not dtm_obj.is_public and (user not in dtm_obj.participants.all()):
+        if dtm_obj.price <= user.balance:
+            user.balance = user.balance - dtm_obj.price
+            user.save()
+            dtm_obj.participants.add(user)
+            dtm_obj.save()
+            return Response({"status": "success", "error": None, "data": None})
+        else:
+            return Response(
+                {"status": "error", "error": "balance_is_not_enough", "data": None}
+            )
+    else:
+        dtm_obj.participants.add(user)
+        dtm_obj.save()
 
-
-@decorators.api_view(http_method_names=["POST"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def join_dtm(request: HttpRequest, pk):
-    dtm_obj = Dtm.objects.filter(pk=pk)
-
-    if not dtm_obj.exists():
-        return Response(
-            {"status": "error", "error": "dtm_not_found", "data": None}, status=404
-        )
-
-    dtm_obj = dtm_obj.first()
-
-    dtm_obj.participants.add(request.user)
-    dtm_obj.save()
-
-    return Response({"status": "success", "error": None, "data": None})
+    return Response(
+        {"status": "error", "error": "dtm_is_public_or_purchased", "data": None}
+    )
 
 
 # cefr
 class CefrListAPIView(generics.ListAPIView):
     queryset = Cefr.objects.all()
     serializer_class = CefrsSerializer
-    
-    
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["subject"]
 
 
+@swagger_auto_schema(
+    method="get",
+    operation_description="CEFR ni olish",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
@@ -168,7 +186,21 @@ def get_cefr(request: HttpRequest, pk: int):
     )
 
 
-@decorators.api_view(http_method_names=["GET"])
+@swagger_auto_schema(
+    method="post",
+    operation_description="CEFR ni sotib olish",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
 def purchase_cefr(request: HttpRequest, pk: int):
@@ -183,62 +215,41 @@ def purchase_cefr(request: HttpRequest, pk: int):
     cefr_obj = cefr_obj.first()
 
     if cefr_obj.group:
-        return Response({
-            "status": "error",
-            "error": "cefr_for_group",
-            "data": None
-        })
+        return Response({"status": "error", "error": "cefr_for_group", "data": None})
 
-    if not cefr_obj.is_public and user not in cefr_obj.participants.all():
-        user.balance = user.balance - cefr_obj.price
-        user.save()
-        return Response({
-            "status": "success",
-            "error": None,
-            "data": None
-        })
-    
-    return Response({
-        "status": "error",
-        "error": "cefr_is_public_or_purchased",
-        "data": None
-    })
+    if not cefr_obj.is_public and (user not in cefr_obj.participants.all()):
+        if cefr_obj.price <= user.balance:
+            user.balance = user.balance - cefr_obj.price
+            user.save()
+            cefr_obj.participants.add(user)
+            cefr_obj.save()
+            return Response({"status": "success", "error": None, "data": None})
+        else:
+            return Response(
+                {"status": "error", "error": "balance_is_not_enough", "data": None}
+            )
+    else:
+        cefr_obj.participants.add(user)
+        cefr_obj.save()
 
-
-
-@decorators.api_view(http_method_names=["POST"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def join_cefr(request: HttpRequest, pk):
-    cefr_obj = Cefr.objects.filter(pk=pk)
-
-    if not cefr_obj.exists():
-        return Response(
-            {"status": "error", "error": "cefr_not_found", "data": None}, status=404
-        )
-
-    cefr_obj = cefr_obj.first()
-
-    cefr_obj.participants.add(request.user)
-    cefr_obj.save()
-
-    return Response({"status": "success", "error": None, "data": None})
-
+    return Response(
+        {"status": "error", "error": "cefr_is_public_or_purchased", "data": None}
+    )
 
 
 @swagger_auto_schema(
     method="get",
-    operation_description="Get statistics",
+    operation_description="Profile statistikasi",
     request_body=None,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -255,14 +266,14 @@ def get_statistics(request: HttpRequest):
 
     if filter_by == "monthly":
         dtms = DTMResult.objects.filter(
-            created__year=now.year, created__month=now.month
+            created__year=now.year, created__month=now.month, author=user
         )
     elif filter_by == "weekly":
         dtms = DTMResult.objects.filter(
             created__date__gte=start_of_week.date(),
             created__date__lte=end_of_week.date(),
+            author=user,
         )
-
 
     cefrs = CEFRResult.objects.all()
 
@@ -276,13 +287,15 @@ def get_statistics(request: HttpRequest):
             created__date__lte=end_of_week.date(),
         )
 
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": {
-            "dtms": dtms.count(),
-            "passed_dtms": dtms.filter(status="passed").count(),
-            "cefrs": cefrs.count(),
-            "passed_cefrs": cefrs.filter(status="passed").count(),
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": {
+                "dtms": dtms.count(),
+                "passed_dtms": dtms.filter(status="passed").count(),
+                "cefrs": cefrs.count(),
+                "passed_cefrs": cefrs.filter(status="passed").count(),
+            },
         }
-    })
+    )
