@@ -155,7 +155,7 @@ class CefrSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Dtm
-        fields = ("id", "name", "created", "started", "ended", "questions", "is_open", "is_solved", "is_public", )
+        fields = ("id", "name", "price", "created", "started", "ended", "questions", "is_open", "is_solved", "is_public", )
 
 
 class CefrsSerializer(serializers.ModelSerializer):
@@ -178,7 +178,7 @@ class CefrsSerializer(serializers.ModelSerializer):
         
     class Meta:
         model = Cefr
-        fields = ("id", "subject", "name", "created", "started", "ended", "is_open", "is_solved", "is_public", )
+        fields = ("id", "subject", "name", "price", "created", "started", "ended", "is_open", "is_solved", "is_public", )
 
 
 class DTMResultSerializer(serializers.ModelSerializer):
