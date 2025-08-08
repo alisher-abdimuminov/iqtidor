@@ -69,7 +69,7 @@ def get_groups(request: HttpRequest):
 @decorators.permission_classes(permission_classes=[IsAuthenticated])
 def join_group(request: HttpRequest, pk: int):
     user = request.user
-    old_group = Group.objects.filter(member=user)
+    old_group = Group.objects.filter(members=user)
     if old_group:
         old_group = old_group.first()
         old_group.members.remove(user)
