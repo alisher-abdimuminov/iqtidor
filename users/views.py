@@ -393,7 +393,7 @@ def payme_callback(request: HttpRequest):
             )
 
         transaction = transaction.first()
-        transaction.author.balance = transaction.amount
+        transaction.author.balance = transaction.author.balance + transaction.amount
         transaction.author.save()
         transaction.state = 2
         transaction.save()

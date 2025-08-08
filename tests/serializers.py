@@ -57,7 +57,7 @@ class BlockSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Block
-        fields = ("id", "dtm", "name", "subject", "tests", )
+        fields = ("id", "dtm", "name", "subject", "tests", "ball", )
 
 
 class DtmSerializer(serializers.ModelSerializer):
