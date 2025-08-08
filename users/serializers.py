@@ -1,6 +1,21 @@
 from rest_framework import serializers
 
-from .models import User, Group, Invite
+from .models import User, Group, Transaction
+
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = (
+            "type",
+            "tid",
+            "service",
+            "description",
+            "state",
+            "amount",
+            "created",
+        )
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -10,18 +25,9 @@ class GroupSerializer(serializers.ModelSerializer):
             "id",
             "teacher",
             "name",
-            "price",
             "count_members",
-            "max_members",
             "created",
         )
-
-
-class InvitesSerializer(serializers.ModelSerializer):
-    group = GroupSerializer()
-    class Meta:
-        model = Invite
-        fields = ("id", "group", )
 
 
 class UserSerializer(serializers.ModelSerializer):

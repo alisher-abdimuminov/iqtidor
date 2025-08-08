@@ -11,16 +11,73 @@ from rest_framework.authentication import TokenAuthentication
 
 from utils.worker import Worker
 
-from .models import User, Group, Invite, Transaction
+from .models import User, Group, Transaction
 from .serializers import (
     UserSerializer,
     UserEditSerializer,
     StudentsSerializer,
-    InvitesSerializer,
     SignUpBodySerializer,
     LoginBodySerializer,
     EditProfileSerializer,
+    GroupSerializer,
+    TransactionSerializer
 )
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Guruhlar ro'yxati",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
+)
+@decorators.api_view(http_method_names=["GET"])
+def get_groups(request: HttpRequest):
+    groups = Group.objects.all()
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": GroupSerializer(groups, many=True).data,
+        }
+    )
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Tranzaksiyalar ro'yxati",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
+)
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def get_transactions(request: HttpRequest):
+    user = request.user
+    transactions = Transaction.objects.filter(author=user)
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": TransactionSerializer(transactions, many=True).data,
+        }
+    )
+
 
 
 @swagger_auto_schema(
@@ -163,7 +220,6 @@ def delete(request: HttpRequest):
     return Response({"status": "success", "error": None, "data": None})
 
 
-
 @swagger_auto_schema(
     method="get",
     operation_description="Profile endpoint",
@@ -218,212 +274,6 @@ def edit_profile(request: HttpRequest):
         return Response({"status": "success", "error": None, "data": None})
 
     return Response({"status": "error", "error": "fill_empty_fields", "data": None})
-
-
-
-@swagger_auto_schema(
-    method="get",
-    operation_description="Get invites list",
-    request_body=None,
-    manual_parameters=[
-        openapi.Parameter(
-            'Authorization',
-            openapi.IN_HEADER,
-            description="Token",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ]
-)
-@decorators.api_view(http_method_names=["GET"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def get_invites(request: HttpRequest):
-    user: User = request.user
-    invites = Invite.objects.filter(student=user)
-    invites_serializer = InvitesSerializer(invites, many=True).data
-    return Response(
-        {"status": "success", "error": None, "data": {"invites": invites_serializer}}
-    )
-
-
-
-@swagger_auto_schema(
-    method="post",
-    operation_description="Accept invite",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "invite": openapi.Schema(type=openapi.TYPE_INTEGER, description="Invite id/pk")
-        }
-    ),
-    manual_parameters=[
-        openapi.Parameter(
-            'Authorization',
-            openapi.IN_HEADER,
-            description="Token",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ]
-)
-@decorators.api_view(http_method_names=["POST"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def accept_invite(request: HttpRequest):
-    user: User = request.user
-    invite = request.data.get("invite")
-
-    if not invite:
-        return Response(
-            {"status": "error", "error": "invite_required", "data": None}, status=400
-        )
-
-    invite = Invite.objects.filter(pk=invite)
-
-    if not invite.exists():
-        return Response({"status": "error", "error": "invite_not_found", "data": None})
-
-    invite = invite.first()
-
-    if invite.group.price <= invite.student.balance:
-        invite.group.members.add(user)
-        invite.student.balance = invite.student.balance - invite.group.price
-        invite.student.save()
-        invite.group.save()
-
-        return Response({"status": "success", "error": None, "data": None})
-    else:
-        return Response({
-            "status": "error",
-            "error": "balance_is_not_enough",
-            "data": None
-        })
-
-
-# Teacher endpoints
-# get students list
-@swagger_auto_schema(
-    method="get",
-    operation_description="Get students list for teachers",
-    request_body=None,
-    manual_parameters=[
-        openapi.Parameter(
-            'Authorization',
-            openapi.IN_HEADER,
-            description="Token",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ]
-)
-@decorators.api_view(http_method_names=["GET"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def get_students(request: HttpRequest):
-    students = User.objects.filter(role="student")
-    students_serializer = StudentsSerializer(students, many=True).data
-    return Response(
-        {"status": "success", "error": None, "data": {"students": students_serializer}}
-    )
-
-
-# create new group
-@swagger_auto_schema(
-    method="post",
-    operation_description="Create new group for teachers",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Group name")
-        }
-    ),
-    manual_parameters=[
-        openapi.Parameter(
-            'Authorization',
-            openapi.IN_HEADER,
-            description="Token",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ]
-)
-@decorators.api_view(http_method_names=["POST"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def create_group(request: HttpRequest):
-    user: User = request.user
-    name = request.data.get("name")
-
-    if not name:
-        return Response(
-            {"status": "error", "error": "name_required", "data": None}, status=400
-        )
-
-    Group.objects.create(teacher=user, name=name)
-    return Response({"status": "success", "error": None, "data": None})
-
-
-# invite members for group
-@swagger_auto_schema(
-    method="post",
-    operation_description="Invite students to group",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "group": openapi.Schema(type=openapi.TYPE_STRING, description="Group id/pk"),
-            "students": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER), description="List of students id"),
-        }
-    ),
-    manual_parameters=[
-        openapi.Parameter(
-            'Authorization',
-            openapi.IN_HEADER,
-            description="Token",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ]
-)
-@decorators.api_view(http_method_names=["POST"])
-@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
-@decorators.permission_classes(permission_classes=[IsAuthenticated])
-def invite_members(request: HttpRequest):
-    group = request.data.get("group")
-    students = request.data.get("students", [])
-
-    if not group:
-        return Response(
-            {"status": "error", "error": "group_required", "data": None}, status=400
-        )
-
-    if not students:
-        return Response(
-            {"status": "error", "error": "students_required", "data": None}, status=400
-        )
-
-    if not isinstance(students, list):
-        return Response({"status": "error", "error": "students_invalid", "data": None})
-
-    group = Group.objects.filter(id=group)
-
-    if not group.exists():
-        return Response(
-            {"status": "error", "error": "group_not_found", "data": None}, status=400
-        )
-
-    group = group.first()
-
-    worker = Worker(
-        lambda students, group: [
-            Invite.objects.create(student=s, group=group)
-            for s in User.objects.filter(pk__in=students, role="student")
-        ],
-        students=students,
-        group=group,
-    )
-
-    worker.start()
 
 
 # PayMe callback handler for payments

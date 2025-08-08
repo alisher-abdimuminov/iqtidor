@@ -15,6 +15,7 @@ PAYME_STATE = (
     (2, "To'lov amalga muvafaqqiyatli amalga oshirildi"),
     (-1, "To'lov bekor qilindi"),
     (-2, "To'lov tugallangandan keyin qaytarildi."),
+    (3, "Yechib olindi")
 )
 
 
@@ -52,9 +53,7 @@ class User(AbstractUser):
 class Group(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    price = models.IntegerField(default=0)
     members = models.ManyToManyField(User, related_name="group_users", blank=True)
-    max_members = models.IntegerField(default=10)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -68,26 +67,14 @@ class Group(models.Model):
     class Meta:
         verbose_name = "Guruh"
         verbose_name_plural = "Guruhlar"
-    
-
-class Invite(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.student.phone
-    
-    class Meta:
-        verbose_name = "Taklif"
-        verbose_name_plural = "Takliflar"
 
     
 class Transaction(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    type = models.CharField(max_length=100, choices=(("income", "Kirim"), ("expense", "Chiqim")), default="income")
     tid = models.CharField(max_length=100)
+    service = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     state = models.IntegerField(choices=PAYME_STATE)
     amount = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
