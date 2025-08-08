@@ -1,3 +1,4 @@
+from uuid import uuid4
 from drf_yasg import openapi
 from rest_framework import generics
 from django.http import HttpRequest
@@ -9,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authentication import TokenAuthentication
 
-from users.models import User
+from users.models import User, Transaction
 
 from .models import (
     Dtm,
@@ -134,6 +135,15 @@ def purchase_dtm(request: HttpRequest, pk: int):
             user.save()
             dtm_obj.participants.add(user)
             dtm_obj.save()
+            Transaction.objects.create(
+                author=user,
+                type="expense",
+                tid=str(uuid4()),
+                service="purchase_dtm",
+                description=dtm_obj.name,
+                state=3,
+                amount=dtm_obj.price,
+            )
             return Response({"status": "success", "error": None, "data": None})
         else:
             return Response(
@@ -231,6 +241,15 @@ def purchase_cefr(request: HttpRequest, pk: int):
             user.save()
             cefr_obj.participants.add(user)
             cefr_obj.save()
+            Transaction.objects.create(
+                author=user,
+                type="expense",
+                tid=str(uuid4()),
+                service="purchase_cefr",
+                description=cefr_obj.name,
+                state=3,
+                amount=cefr_obj.price,
+            )
             return Response({"status": "success", "error": None, "data": None})
         else:
             return Response(

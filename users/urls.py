@@ -9,6 +9,7 @@ from .views import (
     edit_profile,
     get_transactions,
     get_groups,
+    join_group,
 
     payme_callback,
 )
@@ -23,6 +24,7 @@ urlpatterns = [
     path("auth/profile/edit/", edit_profile),
     path("auth/transactions/", get_transactions),
     path("groups/", get_groups),
+    path("groups/join/<int:pk>/", join_group),
 
     path("payme_callback/", payme_callback),
 ]

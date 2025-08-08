@@ -51,6 +51,49 @@ def get_groups(request: HttpRequest):
 
 
 @swagger_auto_schema(
+    method="post",
+    operation_description="Guruhga qo'shilish",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            'Authorization',
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ]
+)
+@decorators.api_view(http_method_names=["POST"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def join_group(request: HttpRequest, pk: int):
+    user = request.user
+    old_group = Group.objects.filter(member=user)
+    if old_group:
+        old_group = old_group.first()
+        old_group.members.remove(user)
+        old_group.save()
+    new_group = Group.objects.filter(pk=pk)
+
+    if new_group:
+        new_group = new_group.first()
+        new_group.members.add(user)
+        new_group.save()
+
+        return Response({
+            "status": "success",
+            "error": None,
+            "data": None
+        })
+    return Response({
+        "status": "error",
+        "error": "group_not_found",
+        "data": None
+    })
+
+
+@swagger_auto_schema(
     method="get",
     operation_description="Tranzaksiyalar ro'yxati",
     request_body=None,
