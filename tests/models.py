@@ -190,7 +190,7 @@ class DTMResult(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.status
+        return str(self.status)
     
 
 class CEFRResult(models.Model):
@@ -205,4 +205,4 @@ class CEFRResult(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.status
+        return str(self.status)
