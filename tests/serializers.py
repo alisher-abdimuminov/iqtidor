@@ -186,7 +186,6 @@ class CefrsSerializer(serializers.ModelSerializer):
 
 
 class DTMResultSerializer(serializers.ModelSerializer):
-    dtm = DtmsSerializer()
     class Meta:
         model = DTMResult
         fields = (
@@ -197,7 +196,6 @@ class DTMResultSerializer(serializers.ModelSerializer):
 
 
 class CEFRResultSerializer(serializers.ModelSerializer):
-    cefr = CefrsSerializer()
     class Meta:
         model = CEFRResult
         fields = (
