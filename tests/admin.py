@@ -13,7 +13,20 @@ from .models import (
     Question,
     QuestionAnswer,
     Banner,
+    CEFRResult,
+    DTMResult
 )
+
+
+
+@admin.register(CEFRResult)
+class CefrResultAdmin(ModelAdmin):
+    list_display = ["points"]
+
+
+@admin.register(DTMResult)
+class DtmResultAdmin(ModelAdmin):
+    list_display = ["points"]
 
 
 
