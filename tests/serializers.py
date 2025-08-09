@@ -91,7 +91,7 @@ class DtmSerializer(serializers.ModelSerializer):
 
 class DtmsSerializer(serializers.ModelSerializer):
     is_open = serializers.SerializerMethodField("get_is_open")
-    is_solved = serializers.SerializerMethodField("get_is_solved")
+    result = serializers.SerializerMethodField("get_result")
 
     def get_is_open(self, obj: Dtm):
         request: HttpRequest = self.context.get("request")
@@ -99,17 +99,18 @@ class DtmsSerializer(serializers.ModelSerializer):
             return True
         return False
     
-    def get_is_solved(self, obj: Dtm):
-        request: HttpRequest = self.context.get("request")
-        dtm_result = DTMResult.objects.filter(author=request.user, dtm=obj)
+    def get_result(self, obj: Dtm):
+        request = self.context.get("request")
+        result = DTMResult.objects.filter(dtm=obj, author=request.user)
 
-        if dtm_result:
-            return True
-        return False
+        if result:
+            result = result.first()
+            return DTMResultSerializer(result).data
+        return None
 
     class Meta:
         model = Dtm
-        fields = ("id", "name", "price", "created", "started", "ended", "is_open", "is_solved", "is_public", )
+        fields = ("id", "name", "price", "created", "started", "ended", "is_open", "result", "is_public", )
 
 # cefr
 class QuestionAnswerSerializerer(serializers.ModelSerializer):
@@ -133,7 +134,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 class CefrSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField("get_questions")
     is_open = serializers.SerializerMethodField("get_is_open")
-    is_solved = serializers.SerializerMethodField("get_is_solved")
+    status = serializers.SerializerMethodField("get_status")
 
     def get_questions(self, obj: Cefr):
         questions = Question.objects.filter(cefr=obj)
@@ -145,22 +146,23 @@ class CefrSerializer(serializers.ModelSerializer):
             return True
         return False
     
-    def get_is_solved(self, obj: Cefr):
+    def get_result(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
-        cefr_result = CEFRResult.objects.filter(author=request.user, cefr=obj)
+        result = CEFRResult.objects.filter(cefr=obj, author=request.user)
 
-        if cefr_result:
-            return True
-        return False
+        if result:
+            result = result.first()
+            return CEFRResultSerializer(result).data
+        return None
     
     class Meta:
         model = Dtm
-        fields = ("id", "name", "price", "created", "started", "ended", "questions", "is_open", "is_solved", "is_public", )
+        fields = ("id", "name", "price", "created", "started", "ended", "questions", "is_open", "result", "is_public", )
 
 
 class CefrsSerializer(serializers.ModelSerializer):
     is_open = serializers.SerializerMethodField("get_is_open")
-    is_solved = serializers.SerializerMethodField("get_is_solved")
+    result = serializers.SerializerMethodField("get_result")
 
     def get_is_open(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
@@ -168,17 +170,18 @@ class CefrsSerializer(serializers.ModelSerializer):
             return True
         return False
     
-    def get_is_solved(self, obj: Cefr):
+    def get_result(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
-        cefr_result = CEFRResult.objects.filter(author=request.user, cefr=obj)
+        result = CEFRResult.objects.filter(cefr=obj, author=request.user)
 
-        if cefr_result:
-            return True
-        return False
+        if result:
+            result = result.first()
+            return CEFRResultSerializer(result).data
+        return None
         
     class Meta:
         model = Cefr
-        fields = ("id", "subject", "name", "price", "created", "started", "ended", "is_open", "is_solved", "is_public", )
+        fields = ("id", "subject", "name", "price", "created", "started", "ended", "is_open", "result", "is_public", )
 
 
 class DTMResultSerializer(serializers.ModelSerializer):

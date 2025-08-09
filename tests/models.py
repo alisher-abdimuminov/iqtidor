@@ -10,6 +10,7 @@ TEST_TYPE = (
     ("writable", "Javob yoziladigan"),
 )
 RESULT_TYPE = (
+    ("calculating", "Hisoblanmoqda"),
     ("failed", "Yiqilgan"),
     ("passed", "O'tgan")
 )
@@ -183,7 +184,7 @@ class DTMResult(models.Model):
     dtm = models.ForeignKey(Dtm, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
     points = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=10, choices=RESULT_TYPE)
+    status = models.CharField(max_length=20, choices=RESULT_TYPE)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -198,7 +199,7 @@ class CEFRResult(models.Model):
     cases = models.JSONField(default=dict)
     points = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     degree = models.CharField(max_length=5, choices=CEFR_DEGREE_TYPE, default="nc")
-    status = models.CharField(max_length=10, choices=RESULT_TYPE, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=RESULT_TYPE, null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

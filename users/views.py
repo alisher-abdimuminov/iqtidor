@@ -288,7 +288,6 @@ def profile(request: HttpRequest):
     )
 
 
-
 @swagger_auto_schema(
     method="post",
     operation_description="Edit profile endpoint",
