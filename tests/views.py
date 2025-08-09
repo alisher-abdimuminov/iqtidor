@@ -498,6 +498,7 @@ def my_tests(request: HttpRequest):
     dtms = Dtm.objects.filter(participants=user)
     cefrs = Cefr.objects.filter(participants=user)
 
+    print("my request", request)
     return Response({
         "status": "success",
         "error": None,
