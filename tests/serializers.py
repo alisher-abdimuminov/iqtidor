@@ -173,11 +173,11 @@ class CefrsSerializer(serializers.ModelSerializer):
     
     def get_result(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
-        result = CEFRResult.objects.filter(cefr=obj, author=request.user)
+        # result = CEFRResult.objects.filter(cefr=obj, author=request.user)
 
-        if result:
-            result = result.first()
-            return CEFRResultSerializer(result).data
+        # if result:
+        #     result = result.first()
+        #     return CEFRResultSerializer(result).data
         return None
         
     class Meta:
