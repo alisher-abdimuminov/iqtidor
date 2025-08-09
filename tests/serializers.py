@@ -166,12 +166,14 @@ class CefrsSerializer(serializers.ModelSerializer):
 
     def get_is_open(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
+        print("request", request)
         if obj.participants.all().contains(request.user):
             return True
         return False
     
     def get_result(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
+        print("request", request)
         result = CEFRResult.objects.filter(cefr=obj, author=request.user)
 
         if result:
