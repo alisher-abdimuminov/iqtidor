@@ -1,4 +1,6 @@
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
 
 from users.models import User, Group
 
@@ -122,6 +124,7 @@ class Cefr(models.Model):
     )
     is_public = models.BooleanField(default=False)
     passing_score = models.DecimalField(max_digits=10, decimal_places=2)
+    is_calculated = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField()
@@ -206,3 +209,9 @@ class CEFRResult(models.Model):
 
     def __str__(self):
         return str(self.status)
+
+
+@receiver(pre_save, sender=Cefr)
+def calculate_results(sender, instance: Cefr, **kwargs):
+    if not instance.is_calculated:
+        print("calculating...")

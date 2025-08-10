@@ -134,7 +134,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 class CefrSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField("get_questions")
     is_open = serializers.SerializerMethodField("get_is_open")
-    status = serializers.SerializerMethodField("get_status")
+    result = serializers.SerializerMethodField("get_result")
 
     def get_questions(self, obj: Cefr):
         questions = Question.objects.filter(cefr=obj)
