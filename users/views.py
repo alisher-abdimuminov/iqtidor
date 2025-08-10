@@ -15,12 +15,12 @@ from .models import User, Group, Transaction
 from .serializers import (
     UserSerializer,
     UserEditSerializer,
-    StudentsSerializer,
+    TeacherSerializer,
     SignUpBodySerializer,
     LoginBodySerializer,
     EditProfileSerializer,
     GroupSerializer,
-    TransactionSerializer
+    TransactionSerializer,
 )
 
 
@@ -30,13 +30,13 @@ from .serializers import (
     request_body=None,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["GET"])
 def get_groups(request: HttpRequest):
@@ -56,13 +56,13 @@ def get_groups(request: HttpRequest):
     request_body=None,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -81,16 +81,8 @@ def join_group(request: HttpRequest, pk: int):
         new_group.members.add(user)
         new_group.save()
 
-        return Response({
-            "status": "success",
-            "error": None,
-            "data": None
-        })
-    return Response({
-        "status": "error",
-        "error": "group_not_found",
-        "data": None
-    })
+        return Response({"status": "success", "error": None, "data": None})
+    return Response({"status": "error", "error": "group_not_found", "data": None})
 
 
 @swagger_auto_schema(
@@ -99,13 +91,13 @@ def join_group(request: HttpRequest, pk: int):
     request_body=None,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -120,7 +112,6 @@ def get_transactions(request: HttpRequest):
             "data": TransactionSerializer(transactions, many=True).data,
         }
     )
-
 
 
 @swagger_auto_schema(
@@ -239,20 +230,19 @@ def login(request: HttpRequest):
     )
 
 
-
 @swagger_auto_schema(
     method="post",
     operation_description="Delete account endpoint",
     request_body=None,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -269,13 +259,13 @@ def delete(request: HttpRequest):
     request_body=None,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["GET"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])
@@ -294,13 +284,13 @@ def profile(request: HttpRequest):
     request_body=EditProfileSerializer,
     manual_parameters=[
         openapi.Parameter(
-            'Authorization',
+            "Authorization",
             openapi.IN_HEADER,
             description="Token",
             type=openapi.TYPE_STRING,
-            required=True
+            required=True,
         )
-    ]
+    ],
 )
 @decorators.api_view(http_method_names=["POST"])
 @decorators.authentication_classes(authentication_classes=[TokenAuthentication])

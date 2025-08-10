@@ -8,10 +8,25 @@ from .models import User, Transaction, Group
 
 @admin.register(User)
 class UserModelAdmin(UserAdmin, ModelAdmin):
-    list_display = ["phone", "first_name", "last_name", "balance", "city", "town", "school"]
+    list_display = [
+        "phone",
+        "first_name",
+        "last_name",
+        "balance",
+        "city",
+        "town",
+        "school",
+    ]
     ordering = ["phone"]
-    list_filter = ["city", "town", ]
-    search_fields = ["phone", "first_name", "last_name", ]
+    list_filter = [
+        "city",
+        "town",
+    ]
+    search_fields = [
+        "phone",
+        "first_name",
+        "last_name",
+    ]
 
     model = User
     form = UserChangeForm
@@ -19,59 +34,91 @@ class UserModelAdmin(UserAdmin, ModelAdmin):
 
     add_fieldsets = (
         (
-            "Ma'lumotlar", {
+            "Ma'lumotlar",
+            {
                 "fields": (
-                    "phone", "first_name", "last_name", "password1", "password2",
+                    "phone",
+                    "first_name",
+                    "last_name",
+                    "password1",
+                    "password2",
                 )
-            }
+            },
         ),
         (
-            "Joylashuv", {
+            "Joylashuv",
+            {
                 "fields": (
-                    "city", "town", "village", "school",
+                    "city",
+                    "town",
+                    "village",
+                    "school",
                 )
-            }
+            },
         ),
         (
-            "Qo'shimcha", {
+            "Qo'shimcha",
+            {
                 "fields": (
-                    "role", "image",
+                    "role",
+                    "image",
                 )
-            }
-        )
+            },
+        ),
     )
 
     fieldsets = (
         (
-            "Ma'lumotlar", {
+            "Ma'lumotlar",
+            {
                 "fields": (
-                    "phone", "first_name", "last_name",
+                    "phone",
+                    "first_name",
+                    "last_name",
                 )
-            }
+            },
         ),
         (
-            "Joylashuv", {
+            "Joylashuv",
+            {
                 "fields": (
-                    "city", "town", "village", "school",
+                    "city",
+                    "town",
+                    "village",
+                    "school",
                 )
-            }
+            },
         ),
         (
-            "Qo'shimcha", {
+            "Qo'shimcha",
+            {
                 "fields": (
-                    "role", "image",
+                    "role",
+                    "image",
                 )
-            }
-        )
+            },
+        ),
     )
 
 
 @admin.register(Transaction)
 class TransactionModelAdmin(ModelAdmin):
-    list_display = ["author", "type", "tid", "service", "description", "amount", "state", "created", ]
+    list_display = [
+        "author",
+        "type",
+        "tid",
+        "service",
+        "description",
+        "amount",
+        "state",
+        "created",
+    ]
 
 
 @admin.register(Group)
 class GroupModelAdmin(ModelAdmin):
-    list_display = ["name", "teacher", "count_members",]
-
+    list_display = [
+        "name",
+        "teacher",
+        "count_members",
+    ]

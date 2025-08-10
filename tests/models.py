@@ -194,6 +194,7 @@ class Banner(models.Model):
 
 class DTMResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="dtm_result_teacher")
     dtm = models.ForeignKey(Dtm, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
     points = models.DecimalField(max_digits=10, decimal_places=2)
@@ -386,12 +387,13 @@ class Rash(models.Model):
                                     id=str(cefr_result.cefr.uuid),
                                     subject=cefr_result.cefr.subject.name,
                                     points="%.2f" % cefr_result.rash,
-                                    percentage="%.2f" % cefr_result.ratio_of_total_questions,
+                                    percentage="%.2f"
+                                    % cefr_result.ratio_of_total_questions,
                                     degree=cefr_result.degree,
                                     date=cefr_result.created.strftime("%d/%m/%Y"),
                                     director="Sanjar Sultonov",
                                 ),
-                                f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf"
+                                f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
                             ),
                         )
 

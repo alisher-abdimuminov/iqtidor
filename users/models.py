@@ -15,26 +15,40 @@ PAYME_STATE = (
     (2, "To'lov amalga muvafaqqiyatli amalga oshirildi"),
     (-1, "To'lov bekor qilindi"),
     (-2, "To'lov tugallangandan keyin qaytarildi."),
-    (3, "Yechib olindi")
+    (3, "Yechib olindi"),
 )
 
 
 class User(AbstractUser):
     username = None
-    phone = models.CharField(max_length=100, unique=True, null=False, blank=False, verbose_name="Telefon raqami")
+    phone = models.CharField(
+        max_length=100,
+        unique=True,
+        null=False,
+        blank=False,
+        verbose_name="Telefon raqami",
+    )
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     first_name = models.CharField(max_length=100, verbose_name="Ism")
     last_name = models.CharField(max_length=100, verbose_name="Familiya")
     middle_name = models.CharField(max_length=100, verbose_name="Otasining ismi")
 
-    city = models.CharField(max_length=100, null=True, blank=True, verbose_name="Viloyat")
+    city = models.CharField(
+        max_length=100, null=True, blank=True, verbose_name="Viloyat"
+    )
     town = models.CharField(max_length=100, null=True, blank=True, verbose_name="Tuman")
-    village = models.CharField(max_length=100, null=True, blank=True, verbose_name="Qishloq")
-    school = models.CharField(max_length=100, null=True, blank=True, verbose_name="Maktab")
+    village = models.CharField(
+        max_length=100, null=True, blank=True, verbose_name="Qishloq"
+    )
+    school = models.CharField(
+        max_length=100, null=True, blank=True, verbose_name="Maktab"
+    )
 
     role = models.CharField(max_length=100, choices=ROLE, verbose_name="Role")
-    image = models.ImageField(upload_to="images/users", verbose_name="Rasm", null=True, blank=True)
+    image = models.ImageField(
+        upload_to="images/users", verbose_name="Rasm", null=True, blank=True
+    )
     balance = models.IntegerField(default=0, verbose_name="Balans")
 
     created = models.DateTimeField(auto_now_add=True)
@@ -45,7 +59,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.phone
-    
+
     class Meta:
         verbose_name = "Foydalanuvchi"
         verbose_name_plural = "Foydalanuvchilar"
@@ -61,18 +75,22 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def count_members(self):
         return self.members.count()
-    
+
     class Meta:
         verbose_name = "Guruh"
         verbose_name_plural = "Guruhlar"
 
-    
+
 class Transaction(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    type = models.CharField(max_length=100, choices=(("income", "Kirim"), ("expense", "Chiqim")), default="income")
+    type = models.CharField(
+        max_length=100,
+        choices=(("income", "Kirim"), ("expense", "Chiqim")),
+        default="income",
+    )
     tid = models.CharField(max_length=100)
     service = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -82,8 +100,7 @@ class Transaction(models.Model):
 
     def __str__(self):
         return self.tid
-    
+
     class Meta:
         verbose_name = "To'lov"
         verbose_name_plural = "To'lovlar"
-

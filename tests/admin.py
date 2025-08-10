@@ -19,7 +19,6 @@ from .models import (
 )
 
 
-
 @admin.register(CEFRResult)
 class CefrResultAdmin(ModelAdmin):
     list_display = ["author", "cefr", "rash", "degree"]
@@ -33,7 +32,6 @@ class RashModelAdmin(ModelAdmin):
 @admin.register(DTMResult)
 class DtmResultAdmin(ModelAdmin):
     list_display = ["points"]
-
 
 
 class AnswerInline(StackedInline):
@@ -60,12 +58,20 @@ class TestModelAdmin(ModelAdmin):
 
 @admin.register(Block)
 class BlockModelAdmin(ModelAdmin):
-    list_display = ["name", "subject", ]
+    list_display = [
+        "name",
+        "subject",
+    ]
 
 
 @admin.register(Dtm)
 class DtmModelAdmin(ModelAdmin):
-    list_display = ["name", "created", "started", "ended", ]
+    list_display = [
+        "name",
+        "created",
+        "started",
+        "ended",
+    ]
 
 
 @admin.register(Subject)
@@ -75,12 +81,19 @@ class SubjectModelAdmin(ModelAdmin):
 
 @admin.register(Cefr)
 class CefrModelAdmin(ModelAdmin):
-    list_display = ["name", "subject", "is_public",]
+    list_display = [
+        "name",
+        "subject",
+        "is_public",
+    ]
 
 
 @admin.register(Question)
 class QuestionModelAdmin(ModelAdmin):
-    list_display = ["cefr", "type",]
+    list_display = [
+        "cefr",
+        "type",
+    ]
     inlines = [QuestionAnswerInline]
 
 

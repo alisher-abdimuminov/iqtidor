@@ -3,7 +3,6 @@ from rest_framework import serializers
 from .models import User, Group, Transaction
 
 
-
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
@@ -18,7 +17,22 @@ class TransactionSerializer(serializers.ModelSerializer):
         )
 
 
+class TeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "phone",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "image",
+        )
+
+
 class GroupSerializer(serializers.ModelSerializer):
+    teacher = TeacherSerializer()
+
     class Meta:
         model = Group
         fields = (
@@ -58,17 +72,6 @@ class UserSerializer(serializers.ModelSerializer):
             "group",
             "balance",
             "image",
-        )
-
-
-class StudentsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "id",
-            "phone",
-            "first_name",
-            "last_name",
         )
 
 

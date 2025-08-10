@@ -3,6 +3,7 @@ from drf_yasg import openapi
 from rest_framework import generics
 from django.http import HttpRequest
 from rest_framework import decorators
+from django.db.models import Sum, Count
 from datetime import datetime, timedelta
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
@@ -11,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authentication import TokenAuthentication
 
-from users.models import User, Transaction
+from users.models import User, Transaction, Group
 from utils.generate_answers_sheet import generate_answers_sheet
 
 from .models import (
@@ -392,12 +393,19 @@ def save_dtm_result(request: HttpRequest, pk: int):
     points = request.data.get("points", 0)
     status = "failed"
     cases = request.data.get("cases")
+    teacher = request.data.get("teacher")
+
     dtm = Dtm.objects.filter(pk=pk)
+    teacher = User.objects.filter(pk=teacher)
 
     if not dtm:
         return Response({"status": "error", "error": "dtm_not_found", "data": None})
 
+    if not teacher:
+        return Response({"status": "error", "error": "teacher_not_found", "data": None})
+
     dtm = dtm.first()
+    teacher = teacher.first()
 
     dtm_result = DTMResult.objects.filter(author=user, dtm=dtm)
 
@@ -411,6 +419,7 @@ def save_dtm_result(request: HttpRequest, pk: int):
 
     result = DTMResult.objects.create(
         author=user,
+        teacher=teacher,
         dtm=dtm,
         cases=cases,
         points=points,
@@ -434,7 +443,7 @@ def save_dtm_result(request: HttpRequest, pk: int):
                     ("Blok 4", 61, 90),
                 ),
             ),
-            f"{user.first_name} {user.last_name}.pdf"
+            f"{user.first_name} {user.last_name}.pdf",
         ),
     )
 
@@ -522,3 +531,110 @@ def my_tests(request: HttpRequest):
             },
         }
     )
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="DTM statistika",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def dtm_statistics(request: HttpRequest, pk: int):
+    dtm = Dtm.objects.filter(pk=pk)
+
+    if not dtm:
+        return Response({"status": "error", "error": "dtm_not_found", "data": None})
+
+    dtm = dtm.first()
+
+    top_results = DTMResult.objects.order_by('-points', '-created').values('author__id', 'author__first_name', 'author__last_name', 'points', 'status')
+
+    groups_ranked = (
+        Group.objects
+        .annotate(total_points=Sum('members__dtmresult__points'))
+        .order_by('-total_points', 'name')
+        .values('id', 'name', 'total_points', 'count_members')
+    )
+
+    teachers_ranked = (
+        DTMResult.objects
+        .values('teacher_id', 'teacher__first_name', 'teacher__last_name', 'teacher__phone')
+        .annotate(total_points=Sum('points'), result_count=Count('id'))
+        .order_by('-total_points', '-result_count')
+        .values('teacher_id', 'teacher__first_name', 'teacher__last_name')
+    )
+
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": {
+            "by_point": list(top_results),
+            "by_group": list(groups_ranked),
+            "by_teacher": list(teachers_ranked)
+        }
+    })
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="CEFR statistika",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def cefr_statistics(request: HttpRequest, pk: int):
+    cefr = Cefr.objects.filter(pk=pk)
+
+    if not cefr:
+        return Response({"status": "error", "error": "cefr_not_found", "data": None})
+
+    cefr = cefr.first()
+
+    top_results = CEFRResult.objects.order_by('-rash', '-created').values('author__id', 'author__first_name', 'author__last_name', 'rash', 'degree')
+
+    groups_ranked = (
+        Group.objects
+        .annotate(total_points=Sum('members__cefrresult__rash'))
+        .order_by('-total_points', 'name')
+        .values('id', 'name', 'total_points', 'count_members')
+    )
+
+    teachers_ranked = (
+        DTMResult.objects
+        .values('teacher_id', 'teacher__first_name', 'teacher__last_name', 'teacher__phone')
+        .annotate(total_points=Sum('rash'), result_count=Count('id'))
+        .order_by('-total_points', '-result_count')
+        .values('teacher_id', 'teacher__first_name', 'teacher__last_name')
+    )
+
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": {
+            "by_point": list(top_results),
+            "by_group": list(groups_ranked),
+            "by_teacher": list(teachers_ranked)
+        }
+    })
+

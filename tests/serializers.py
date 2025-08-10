@@ -20,19 +20,34 @@ from .models import (
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
-        fields = ("id", "image", "dtm", "cefr", "is_active", )
+        fields = (
+            "id",
+            "image",
+            "dtm",
+            "cefr",
+            "is_active",
+        )
 
 
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ("id", "name", "count_cefrs", )
+        fields = (
+            "id",
+            "name",
+            "count_cefrs",
+        )
 
 
 class AnswerSerializerer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ("value_1", "value_2", "image", "is_correct", )
+        fields = (
+            "value_1",
+            "value_2",
+            "image",
+            "is_correct",
+        )
 
 
 class TestSerializer(serializers.ModelSerializer):
@@ -44,7 +59,12 @@ class TestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Test
-        fields = ("question", "image", "type", "answers", )
+        fields = (
+            "question",
+            "image",
+            "type",
+            "answers",
+        )
 
 
 class BlockSerializer(serializers.ModelSerializer):
@@ -54,10 +74,17 @@ class BlockSerializer(serializers.ModelSerializer):
     def get_tests(self, obj: Block):
         tests = Test.objects.filter(block=obj)
         return TestSerializer(tests, many=True).data
-    
+
     class Meta:
         model = Block
-        fields = ("id", "dtm", "name", "subject", "tests", "ball", )
+        fields = (
+            "id",
+            "dtm",
+            "name",
+            "subject",
+            "tests",
+            "ball",
+        )
 
 
 class DtmSerializer(serializers.ModelSerializer):
@@ -68,13 +95,13 @@ class DtmSerializer(serializers.ModelSerializer):
     def get_blocks(self, obj: Dtm):
         blocks = Block.objects.filter(dtm=obj)
         return BlockSerializer(blocks, many=True).data
-    
+
     def get_is_open(self, obj: Dtm):
         request: HttpRequest = self.context.get("request")
         if obj.participants.all().contains(request.user):
             return True
         return False
-    
+
     def get_is_solved(self, obj: Dtm):
         request: HttpRequest = self.context.get("request")
         dtm_result = DTMResult.objects.filter(author=request.user, dtm=obj)
@@ -82,11 +109,21 @@ class DtmSerializer(serializers.ModelSerializer):
         if dtm_result:
             return True
         return False
-    
+
     class Meta:
         model = Dtm
-        fields = ("id", "name", "price", "created", "started", "ended", "blocks", "is_open", "is_solved", "is_public", )
-
+        fields = (
+            "id",
+            "name",
+            "price",
+            "created",
+            "started",
+            "ended",
+            "blocks",
+            "is_open",
+            "is_solved",
+            "is_public",
+        )
 
 
 class DtmsSerializer(serializers.ModelSerializer):
@@ -98,7 +135,7 @@ class DtmsSerializer(serializers.ModelSerializer):
         if obj.participants.all().contains(request.user):
             return True
         return False
-    
+
     def get_result(self, obj: Dtm):
         request = self.context.get("request")
         result = DTMResult.objects.filter(dtm=obj, author=request.user)
@@ -110,13 +147,29 @@ class DtmsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dtm
-        fields = ("id", "name", "price", "created", "started", "ended", "is_open", "result", "is_public", )
+        fields = (
+            "id",
+            "name",
+            "price",
+            "created",
+            "started",
+            "ended",
+            "is_open",
+            "result",
+            "is_public",
+        )
+
 
 # cefr
 class QuestionAnswerSerializerer(serializers.ModelSerializer):
     class Meta:
         model = QuestionAnswer
-        fields = ("value_1", "value_2", "image", "is_correct", )
+        fields = (
+            "value_1",
+            "value_2",
+            "image",
+            "is_correct",
+        )
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -128,7 +181,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ("question", "image", "type", "answers", )
+        fields = (
+            "question",
+            "image",
+            "type",
+            "answers",
+        )
 
 
 class CefrSerializer(serializers.ModelSerializer):
@@ -145,7 +203,7 @@ class CefrSerializer(serializers.ModelSerializer):
         if obj.participants.all().contains(request.user):
             return True
         return False
-    
+
     def get_result(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
         result = CEFRResult.objects.filter(cefr=obj, author=request.user)
@@ -154,10 +212,21 @@ class CefrSerializer(serializers.ModelSerializer):
             result = result.first()
             return CEFRResultSerializer(result).data
         return None
-    
+
     class Meta:
         model = Dtm
-        fields = ("id", "name", "price", "created", "started", "ended", "questions", "is_open", "result", "is_public", )
+        fields = (
+            "id",
+            "name",
+            "price",
+            "created",
+            "started",
+            "ended",
+            "questions",
+            "is_open",
+            "result",
+            "is_public",
+        )
 
 
 class CefrsSerializer(serializers.ModelSerializer):
@@ -169,7 +238,7 @@ class CefrsSerializer(serializers.ModelSerializer):
         if obj.participants.all().contains(request.user):
             return True
         return False
-    
+
     def get_result(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
         print("req", request)
@@ -179,10 +248,21 @@ class CefrsSerializer(serializers.ModelSerializer):
             result = result.first()
             return CEFRResultSerializer(result).data
         return None
-        
+
     class Meta:
         model = Cefr
-        fields = ("id", "subject", "name", "price", "created", "started", "ended", "is_open", "result", "is_public", )
+        fields = (
+            "id",
+            "subject",
+            "name",
+            "price",
+            "created",
+            "started",
+            "ended",
+            "is_open",
+            "result",
+            "is_public",
+        )
 
 
 class DTMResultSerializer(serializers.ModelSerializer):

@@ -14,25 +14,25 @@ from .views import (
     save_dtm_result,
     save_cefr_result,
     my_tests,
+    dtm_statistics,
+    cefr_statistics,
 )
 
 
 urlpatterns = [
     path("subjects/", SubjectsListAPIView.as_view()),
     path("banners/", BannersListAPIView.as_view()),
-
     path("dtms/", DtmsListAPIView.as_view()),
     path("dtms/dtm/<int:pk>/", get_dtm),
     path("dtms/dtm/<int:pk>/purchase/", purchase_dtm),
     path("dtms/dtm/<int:pk>/save/", save_dtm_result),
-
+    path("dtms/dtm/<int:pk>/statistics/", dtm_statistics),
     path("cefrs/", CefrListAPIView.as_view()),
     path("cefrs/cefr/<int:pk>/", get_cefr),
     path("cefrs/cefr/<int:pk>/purchase/", purchase_cefr),
     path("cefrs/cefr/<int:pk>/save/", save_cefr_result),
-
+    path("cefrs/cefr/<int:pk>/statistics/", cefr_statistics),
     path("statistics/", get_statistics),
     path("search/<str:search>/", search),
-
     path("my/", my_tests),
 ]
