@@ -63,7 +63,7 @@ df = df.sort_values(by="correct_answers", ascending=False)
 df.to_json("final.json", indent=4)
 df.to_excel("final.xlsx")
 
-print(df)
+print(df["correct_answers"].to_dict())
 
 
 # correct_answers = 35

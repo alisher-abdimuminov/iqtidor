@@ -21,16 +21,16 @@ RESULT_TYPE = (
     ("passed", "O'tgan")
 )
 CEFR_DEGREE_TYPE = (
-    ("a", "A"),
-    ("a+", "A+"),
-    ("b", "B"),
-    ("b+", "B+"),
-    ("c", "C"),
-    ("c+", "C+"),
-    ("d", "D"),
-    ("d+", "D+"),
-    ("f", "F"),
-    ("f+", "F+"),
+    ("A", "A"),
+    ("A+", "A+"),
+    ("B", "B"),
+    ("B+", "B+"),
+    ("C", "C"),
+    ("C+", "C+"),
+    ("D", "D"),
+    ("D+", "D+"),
+    ("F", "F"),
+    ("F+", "F+"),
     ("nc", "Hisoblanmagan"),
 )
 RASH_STATUS = (
@@ -208,6 +208,7 @@ class CEFRResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
+    correct_answers = models.IntegerField(default=0)
     ratio_of_total_questions = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     according_to_the_answers_found = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     deviation = models.DecimalField(max_digits=10, decimal_places=5, default=0)
@@ -296,6 +297,51 @@ class Rash(models.Model):
             df.loc["difficulty", ["by_difficulty_level", "rash", "degree"]] = np.nan
 
             df = df.sort_values(by="correct_answers", ascending=False)
+
+            correct_answers = df["correct_answers"].to_dict()
+            ratio_of_total_questions = df["ratio_of_total_questions"].to_dict()
+            according_to_the_answers_founds = df["according_to_the_answers_found"].to_dict()
+            deviations = df["deviation"].to_dict()
+            by_difficulty_levels = df["by_difficulty_level"].to_dict()
+            rashs = df["rash"].to_dict()
+            degrees = df["degree"].to_dict()
+
+            print(correct_answers)
+            print(ratio_of_total_questions)
+            print(according_to_the_answers_founds)
+            print(deviations)
+            print(by_difficulty_levels)
+            print(rashs)
+            print(degrees)
+
+            for correct_answer, ratio_of_total_question, according_to_the_answers_found, deviation, by_difficulty_level, rash, degree in zip(
+                correct_answers,
+                ratio_of_total_questions,
+                according_to_the_answers_founds,
+                deviations,
+                by_difficulty_levels,
+                rashs,
+                degrees
+            ):
+                phone = correct_answer.split(" ")[-1]
+                student = User.objects.filter(phone=phone)
+
+                if student:
+                    student = student.first()
+                    cefr_result = CEFRResult.objects.filter(cefr=self.cefr, author=student)
+
+                    if cefr_result:
+                        cefr_result = cefr_result.first()
+
+                        cefr_result.correct_answers = correct_answers[correct_answer]
+                        cefr_result.ratio_of_total_questions = ratio_of_total_questions[ratio_of_total_question]
+                        cefr_result.according_to_the_answers_found = according_to_the_answers_founds[according_to_the_answers_found]
+                        cefr_result.deviation = deviations[deviation]
+                        cefr_result.by_difficulty_level = by_difficulty_levels[by_difficulty_level]
+                        cefr_result.rash = rashs[rash]
+                        cefr_result.degree = degrees[degree]
+                        cefr_result.save()
+
 
 
 
