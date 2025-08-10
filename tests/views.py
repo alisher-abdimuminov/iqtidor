@@ -572,7 +572,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
         .values('teacher_id', 'teacher__first_name', 'teacher__last_name', 'teacher__phone')
         .annotate(total_points=Sum('points'), result_count=Count('id'))
         .order_by('-total_points', '-result_count')
-        .values('teacher_id', 'teacher__first_name', 'teacher__last_name')
+        .values('teacher__id', 'teacher__first_name', 'teacher__last_name')
     )
 
     return Response({
@@ -625,7 +625,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
         .values('teacher_id', 'teacher__first_name', 'teacher__last_name', 'teacher__phone')
         .annotate(total_points=Sum('rash'), result_count=Count('id'))
         .order_by('-total_points', '-result_count')
-        .values('teacher_id', 'teacher__first_name', 'teacher__last_name')
+        .values('teacher__id', 'teacher__first_name', 'teacher__last_name')
     )
 
     return Response({
