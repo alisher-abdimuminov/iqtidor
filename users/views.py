@@ -398,3 +398,29 @@ def payme_callback(request: HttpRequest):
         )
 
     return Response({})
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_description="Tranzaksiyalar ro'yxati",
+    request_body=None,
+    manual_parameters=[
+        openapi.Parameter(
+            "Authorization",
+            openapi.IN_HEADER,
+            description="Token",
+            type=openapi.TYPE_STRING,
+            required=True,
+        )
+    ],
+)
+@decorators.api_view(http_method_names=["GET"])
+@decorators.authentication_classes(authentication_classes=[TokenAuthentication])
+@decorators.permission_classes(permission_classes=[IsAuthenticated])
+def get_teachers(request: HttpRequest):
+    teachers = User.objects.filter(role="teacher")
+    return Response({
+        "status": "success",
+        "error": None,
+        "data": TeacherSerializer(teachers, many=True).data
+    })

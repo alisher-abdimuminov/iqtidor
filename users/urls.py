@@ -10,6 +10,7 @@ from .views import (
     get_groups,
     join_group,
     payme_callback,
+    get_teachers,
 )
 
 
@@ -23,4 +24,5 @@ urlpatterns = [
     path("groups/", get_groups),
     path("groups/join/<int:pk>/", join_group),
     path("payme_callback/", payme_callback),
+    path("teachers/", get_teachers),
 ]
