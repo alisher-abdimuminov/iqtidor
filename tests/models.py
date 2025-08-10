@@ -302,7 +302,7 @@ class CEFRResult(models.Model):
 
 class Rash(models.Model):
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
-    file = models.FileField(upload_to="rash/results")
+    file = models.FileField(upload_to="rash/results", null=True, blank=True)
     status = models.CharField(max_length=10, choices=RASH_STATUS, default="waiting")
     
     def __str__(self):
