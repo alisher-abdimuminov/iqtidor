@@ -354,14 +354,20 @@ def search(request: HttpRequest, search: str):
     print(search)
     print(dtms.count())
     print(cefr.count())
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": {
-            "dtms": DtmsSerializer(dtms, many=True, context={ "request": request }).data,
-            "cefrs": CefrsSerializer(cefr, many=True, context={ "request": request }).data
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": {
+                "dtms": DtmsSerializer(
+                    dtms, many=True, context={"request": request}
+                ).data,
+                "cefrs": CefrsSerializer(
+                    cefr, many=True, context={"request": request}
+                ).data,
+            },
         }
-    })
+    )
 
 
 @swagger_auto_schema(
@@ -389,22 +395,16 @@ def save_dtm_result(request: HttpRequest, pk: int):
     dtm = Dtm.objects.filter(pk=pk)
 
     if not dtm:
-        return Response({
-            "status": "error",
-            "error": "dtm_not_found",
-            "data": None
-        })
-    
+        return Response({"status": "error", "error": "dtm_not_found", "data": None})
+
     dtm = dtm.first()
 
     dtm_result = DTMResult.objects.filter(author=user, dtm=dtm)
 
     if dtm_result:
-        return Response({
-            "status": "error",
-            "error": "dtm_already_solved",
-            "data": None
-        })
+        return Response(
+            {"status": "error", "error": "dtm_already_solved", "data": None}
+        )
 
     if points < dtm.passing_score:
         status = "passed"
@@ -417,26 +417,28 @@ def save_dtm_result(request: HttpRequest, pk: int):
         status=status,
     )
 
-    result.answers_sheet.save(f"{user.first_name} {user.last_name}", ContentFile(generate_answers_sheet(
-        answers=result.cases.get("answers", ""),
-        keys=result.cases.get("keys", ""),
-        student=f"{user.first_name} {user.last_name}",
-        score=result.points,
-        date=result.created.strftime("%d/%m/%Y"),
-        groups=(
-            ("Blok 1", 1, 10),
-            ("Blok 2", 11, 20),
-            ("Blok 3", 21, 30),
-            ("Blok 4", 31, 60),
-            ("Blok 4", 61, 90),
-        )
-    )))
+    result.answers_sheet.save(
+        f"{user.first_name} {user.last_name}.pdf",
+        ContentFile(
+            generate_answers_sheet(
+                answers=result.cases.get("answers", ""),
+                keys=result.cases.get("keys", ""),
+                student=f"{user.first_name} {user.last_name}",
+                score=result.points,
+                date=result.created.strftime("%d/%m/%Y"),
+                groups=(
+                    ("Blok 1", 1, 10),
+                    ("Blok 2", 11, 20),
+                    ("Blok 3", 21, 30),
+                    ("Blok 4", 31, 60),
+                    ("Blok 4", 61, 90),
+                ),
+            ),
+            f"{user.first_name} {user.last_name}.pdf"
+        ),
+    )
 
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": None
-    })
+    return Response({"status": "success", "error": None, "data": None})
 
 
 @swagger_auto_schema(
@@ -462,22 +464,16 @@ def save_cefr_result(request: HttpRequest, pk: int):
     cefr = Cefr.objects.filter(pk=pk)
 
     if not cefr:
-        return Response({
-            "status": "error",
-            "error": "cefr_not_found",
-            "data": None
-        })
-    
+        return Response({"status": "error", "error": "cefr_not_found", "data": None})
+
     cefr = cefr.first()
 
     cefr_result = CEFRResult.objects.filter(author=user, cefr=cefr)
 
     if cefr_result:
-        return Response({
-            "status": "error",
-            "error": "cefr_already_solved",
-            "data": None
-        })
+        return Response(
+            {"status": "error", "error": "cefr_already_solved", "data": None}
+        )
 
     CEFRResult.objects.create(
         author=user,
@@ -485,11 +481,7 @@ def save_cefr_result(request: HttpRequest, pk: int):
         cases=cases,
     )
 
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": None
-    })
+    return Response({"status": "success", "error": None, "data": None})
 
 
 @swagger_auto_schema(
@@ -516,13 +508,17 @@ def my_tests(request: HttpRequest):
     cefrs = Cefr.objects.filter(participants=user)
 
     print("my request", request)
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": {
-            "dtms": DtmsSerializer(dtms, many=True, context={ "request": request }).data,
-            "cefrs": CefrsSerializer(cefrs, many=True, context={ "request": request }).data
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": {
+                "dtms": DtmsSerializer(
+                    dtms, many=True, context={"request": request}
+                ).data,
+                "cefrs": CefrsSerializer(
+                    cefrs, many=True, context={"request": request}
+                ).data,
+            },
         }
-    })
-
-
+    )
