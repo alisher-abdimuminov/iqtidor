@@ -200,7 +200,7 @@ class CEFRResultSerializer(serializers.ModelSerializer):
         model = CEFRResult
         fields = (
             "cefr",
-            "points",
+            "rash",
             "degree",
             "status",
         )

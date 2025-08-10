@@ -14,14 +14,20 @@ from .models import (
     QuestionAnswer,
     Banner,
     CEFRResult,
-    DTMResult
+    DTMResult,
+    Rash,
 )
 
 
 
 @admin.register(CEFRResult)
 class CefrResultAdmin(ModelAdmin):
-    list_display = ["points"]
+    list_display = ["author", "cefr", "rash", "degree"]
+
+
+@admin.register(Rash)
+class RashModelAdmin(ModelAdmin):
+    list_display = ["cefr", "status"]
 
 
 @admin.register(DTMResult)
