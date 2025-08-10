@@ -129,18 +129,18 @@ def generate_answers_sheet(
     y_cursor = inner_top
 
     def new_column():
-        global col, y_cursor
+        nonlocal col, y_cursor
         col += 1
         y_cursor = inner_top
 
     def ensure_space(lines_needed=1):
-        global col, y_cursor
+        nonlocal col, y_cursor
         y_needed = lines_needed * line_h
         if y_cursor - y_needed < inner_bottom:
             new_column()
 
     def draw_heading(title):
-        global y_cursor
+        nonlocal y_cursor
         # If near bottom, move to next column before printing heading
         ensure_space(5)
         c.setFillColor(Border)
@@ -151,7 +151,7 @@ def generate_answers_sheet(
         y_cursor -= heading_gap_below + 4
 
     def draw_row(idx1):
-        global y_cursor
+        nonlocal y_cursor
         x0 = inner_left + col * col_w
         y0 = y_cursor
 
