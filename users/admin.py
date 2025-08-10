@@ -16,11 +16,13 @@ class UserModelAdmin(UserAdmin, ModelAdmin):
         "city",
         "town",
         "school",
+        "role",
     ]
     ordering = ["phone"]
     list_filter = [
         "city",
         "town",
+        "role",
     ]
     search_fields = [
         "phone",
