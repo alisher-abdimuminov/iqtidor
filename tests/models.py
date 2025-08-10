@@ -1,3 +1,4 @@
+from uuid import uuid4
 import numpy as np
 import pandas as pd
 from io import BytesIO
@@ -5,6 +6,7 @@ from django.db import models
 from django.core.files.base import ContentFile
 
 
+from utils.generate_certificate import generate_certificate
 
 from users.models import User, Group
 
@@ -18,7 +20,7 @@ TEST_TYPE = (
 RESULT_TYPE = (
     ("calculating", "Hisoblanmoqda"),
     ("failed", "Yiqilgan"),
-    ("passed", "O'tgan")
+    ("passed", "O'tgan"),
 )
 CEFR_DEGREE_TYPE = (
     ("A", "A"),
@@ -57,8 +59,8 @@ class Subject(models.Model):
 
 
 class Dtm(models.Model):
+    uuid = models.UUIDField(default=uuid4)
     name = models.CharField(max_length=100)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     participants = models.ManyToManyField(
         User, related_name="dtm_participants", blank=True
     )
@@ -123,9 +125,9 @@ class Answer(models.Model):
 
 # cefr
 class Cefr(models.Model):
+    uuid = models.UUIDField(default=uuid4)
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     price = models.IntegerField(default=0)
     participants = models.ManyToManyField(
         User, related_name="cefr_participants", blank=True
@@ -188,7 +190,7 @@ class Banner(models.Model):
 
     def __str__(self):
         return str(self.description)
-    
+
 
 class DTMResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -196,26 +198,34 @@ class DTMResult(models.Model):
     cases = models.JSONField(default=dict)
     points = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=RESULT_TYPE)
+    answers_sheet = models.FileField(upload_to="answers_sheets", null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.status)
-    
+
 
 class CEFRResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
     correct_answers = models.IntegerField(default=0)
-    ratio_of_total_questions = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    according_to_the_answers_found = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    ratio_of_total_questions = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0
+    )
+    according_to_the_answers_found = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0
+    )
     deviation = models.DecimalField(max_digits=10, decimal_places=5, default=0)
-    by_difficulty_level = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    by_difficulty_level = models.DecimalField(
+        max_digits=10, decimal_places=5, default=0
+    )
     rash = models.DecimalField(max_digits=10, decimal_places=5, default=0)
     degree = models.CharField(max_length=5, choices=CEFR_DEGREE_TYPE, default="nc")
     status = models.CharField(max_length=20, choices=RESULT_TYPE, null=True, blank=True)
+    certificate = models.FileField(upload_to="certificates", null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -228,16 +238,18 @@ class Rash(models.Model):
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
     file = models.FileField(upload_to="rash/results", null=True, blank=True)
     status = models.CharField(max_length=10, choices=RASH_STATUS, default="waiting")
-    
+
     def __str__(self):
         return self.cefr.name
-    
+
     def save(self, *args, **kwargs):
         if self.status != "done":
             results = CEFRResult.objects.filter(cefr=self.cefr)
             raw = {}
             for result in results:
-                raw[f"{result.author.first_name} {result.author.last_name} {result.author.phone}"] = result.cases
+                raw[
+                    f"{result.author.first_name} {result.author.last_name} {result.author.phone}"
+                ] = result.cases
 
             df = pd.DataFrame(raw).T
             df.columns = df.columns.astype(int)
@@ -251,7 +263,9 @@ class Rash(models.Model):
 
             mean_val = df["correct_answers"].mean()
             std_val = df["correct_answers"].std(ddof=1)
-            df["deviation"] = 0 if std_val == 0 else (df["correct_answers"] - mean_val) / std_val
+            df["deviation"] = (
+                0 if std_val == 0 else (df["correct_answers"] - mean_val) / std_val
+            )
 
             avg_per_q = df.loc[:, question_cols].mean(axis=0)
 
@@ -264,7 +278,9 @@ class Rash(models.Model):
                     return 1
 
             difficulty_row = pd.Series(np.nan, index=df.columns)
-            difficulty_row.loc[question_cols] = avg_per_q.apply(difficulty_fn).astype("Int64").values
+            difficulty_row.loc[question_cols] = (
+                avg_per_q.apply(difficulty_fn).astype("Int64").values
+            )
 
             df.loc["difficulty"] = difficulty_row
 
@@ -292,7 +308,9 @@ class Rash(models.Model):
                 else:
                     return "F"
 
-            df["degree"] = df["rash"].apply(lambda x: degree_fn(x) if pd.notnull(x) else np.nan)
+            df["degree"] = df["rash"].apply(
+                lambda x: degree_fn(x) if pd.notnull(x) else np.nan
+            )
 
             df.loc["difficulty", ["by_difficulty_level", "rash", "degree"]] = np.nan
 
@@ -300,50 +318,84 @@ class Rash(models.Model):
 
             correct_answers = df["correct_answers"].to_dict()
             ratio_of_total_questions = df["ratio_of_total_questions"].to_dict()
-            according_to_the_answers_founds = df["according_to_the_answers_found"].to_dict()
+            according_to_the_answers_founds = df[
+                "according_to_the_answers_found"
+            ].to_dict()
             deviations = df["deviation"].to_dict()
             by_difficulty_levels = df["by_difficulty_level"].to_dict()
             rashs = df["rash"].to_dict()
             degrees = df["degree"].to_dict()
 
-            print(correct_answers)
-            print(ratio_of_total_questions)
-            print(according_to_the_answers_founds)
-            print(deviations)
-            print(by_difficulty_levels)
-            print(rashs)
-            print(degrees)
-
-            for correct_answer, ratio_of_total_question, according_to_the_answers_found, deviation, by_difficulty_level, rash, degree in zip(
+            for (
+                correct_answer,
+                ratio_of_total_question,
+                according_to_the_answers_found,
+                deviation,
+                by_difficulty_level,
+                rash,
+                degree,
+            ) in zip(
                 correct_answers,
                 ratio_of_total_questions,
                 according_to_the_answers_founds,
                 deviations,
                 by_difficulty_levels,
                 rashs,
-                degrees
+                degrees,
             ):
                 phone = correct_answer.split(" ")[-1]
                 student = User.objects.filter(phone=phone)
 
                 if student:
                     student = student.first()
-                    cefr_result = CEFRResult.objects.filter(cefr=self.cefr, author=student)
+                    cefr_result = CEFRResult.objects.filter(
+                        cefr=self.cefr, author=student
+                    )
 
                     if cefr_result:
                         cefr_result = cefr_result.first()
 
                         cefr_result.correct_answers = correct_answers[correct_answer]
-                        cefr_result.ratio_of_total_questions = ratio_of_total_questions[ratio_of_total_question]
-                        cefr_result.according_to_the_answers_found = according_to_the_answers_founds[according_to_the_answers_found]
+                        cefr_result.ratio_of_total_questions = ratio_of_total_questions[
+                            ratio_of_total_question
+                        ]
+                        cefr_result.according_to_the_answers_found = (
+                            according_to_the_answers_founds[
+                                according_to_the_answers_found
+                            ]
+                        )
                         cefr_result.deviation = deviations[deviation]
-                        cefr_result.by_difficulty_level = by_difficulty_levels[by_difficulty_level]
+                        cefr_result.by_difficulty_level = by_difficulty_levels[
+                            by_difficulty_level
+                        ]
                         cefr_result.rash = rashs[rash]
                         cefr_result.degree = degrees[degree]
+
+                        cefr_result.certificate.save(
+                            f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
+                            ContentFile(
+                                generate_certificate(
+                                    logo="bgless.png",
+                                    first_name=cefr_result.author.first_name,
+                                    last_name=cefr_result.author.last_name,
+                                    middle_name=cefr_result.author.middle_name,
+                                    phone=cefr_result.author.phone,
+                                    photo=cefr_result.author.image.url
+                                    if cefr_result.author.image
+                                    else "bgless.png",
+                                    id=str(cefr_result.cefr.uuid),
+                                    subject=cefr_result.cefr.subject.name,
+                                    points="%.2f" % cefr_result.rash,
+                                    percentage="%.2f" % cefr_result.ratio_of_total_questions,
+                                    degree=cefr_result.degree,
+                                    date=cefr_result.created.strftime("%d/%m/%Y"),
+                                    director="Sanjar Sultonov",
+                                ),
+                                f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf"
+                            ),
+                        )
+
                         cefr_result.save()
-
-
-
 
             excel_buffer = BytesIO()
             df.to_excel(excel_buffer)

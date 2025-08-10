@@ -6,11 +6,13 @@ from rest_framework import decorators
 from datetime import datetime, timedelta
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from django.core.files.base import ContentFile
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authentication import TokenAuthentication
 
 from users.models import User, Transaction
+from utils.generate_answers_sheet import generate_answers_sheet
 
 from .models import (
     Dtm,
@@ -52,7 +54,7 @@ class SubjectsListAPIView(generics.ListAPIView):
 
 
 class DtmsListAPIView(generics.ListAPIView):
-    queryset = Dtm.objects.filter(group=None)
+    queryset = Dtm.objects.all()
     serializer_class = DtmsSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -160,7 +162,7 @@ def purchase_dtm(request: HttpRequest, pk: int):
 
 # cefr
 class CefrListAPIView(generics.ListAPIView):
-    queryset = Cefr.objects.filter(group=None)
+    queryset = Cefr.objects.all()
     serializer_class = CefrsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["subject"]
@@ -407,13 +409,28 @@ def save_dtm_result(request: HttpRequest, pk: int):
     if points < dtm.passing_score:
         status = "passed"
 
-    DTMResult.objects.create(
+    result = DTMResult.objects.create(
         author=user,
         dtm=dtm,
         cases=cases,
         points=points,
         status=status,
     )
+
+    result.answers_sheet.save(f"{user.first_name} {user.last_name}", ContentFile(generate_answers_sheet(
+        answers=result.cases.get("answers", ""),
+        keys=result.cases.get("keys", ""),
+        student=f"{user.first_name} {user.last_name}",
+        score=result.points,
+        date=result.created.strftime("%d/%m/%Y"),
+        groups=(
+            ("Blok 1", 1, 10),
+            ("Blok 2", 11, 20),
+            ("Blok 3", 21, 30),
+            ("Blok 4", 31, 60),
+            ("Blok 4", 61, 90),
+        )
+    )))
 
     return Response({
         "status": "success",

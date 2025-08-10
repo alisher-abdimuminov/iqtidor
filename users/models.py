@@ -26,6 +26,7 @@ class User(AbstractUser):
 
     first_name = models.CharField(max_length=100, verbose_name="Ism")
     last_name = models.CharField(max_length=100, verbose_name="Familiya")
+    middle_name = models.CharField(max_length=100, verbose_name="Otasining ismi")
 
     city = models.CharField(max_length=100, null=True, blank=True, verbose_name="Viloyat")
     town = models.CharField(max_length=100, null=True, blank=True, verbose_name="Tuman")

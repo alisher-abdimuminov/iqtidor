@@ -18,4 +18,5 @@ dependencies = [
     "pillow>=11.3.0",
     "psycopg>=3.2.9",
     "python-decouple>=3.8",
+    "reportlab>=4.4.3",
 ]

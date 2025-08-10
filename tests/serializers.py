@@ -192,6 +192,7 @@ class DTMResultSerializer(serializers.ModelSerializer):
             "dtm",
             "points",
             "status",
+            "answers_sheet",
         )
 
 
@@ -203,4 +204,5 @@ class CEFRResultSerializer(serializers.ModelSerializer):
             "rash",
             "degree",
             "status",
+            "certificate",
         )
