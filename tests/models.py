@@ -210,6 +210,7 @@ class DTMResult(models.Model):
 
 class CEFRResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="cefr_result_teacher")
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
     correct_answers = models.IntegerField(default=0)
