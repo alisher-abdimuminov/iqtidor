@@ -564,7 +564,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
         Group.objects
         .annotate(total_points=Sum('members__dtmresult__points'))
         .order_by('-total_points', 'name')
-        .values('id', 'name', 'total_points', 'count_members')
+        .values('id', 'name', 'total_points')
     )
 
     teachers_ranked = (
@@ -617,7 +617,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
         Group.objects
         .annotate(total_points=Sum('members__cefrresult__rash'))
         .order_by('-total_points', 'name')
-        .values('id', 'name', 'total_points', 'count_members')
+        .values('id', 'name', 'total_points')
     )
 
     teachers_ranked = (
