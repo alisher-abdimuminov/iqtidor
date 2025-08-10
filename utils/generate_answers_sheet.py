@@ -23,7 +23,7 @@ def generate_answers_sheet(
     answers: str,
     keys: str,
     student: str,
-    score: float,
+    score: str,
     date: str,
     groups: tuple
 ):
@@ -69,7 +69,7 @@ def generate_answers_sheet(
     c.setFont("Helvetica-Bold", 12)
     c.drawString(MARGIN, y, "Umumiy ball: ")
     c.setFont("Helvetica", 12)
-    c.drawString(MARGIN + 40*mm, y, score)
+    c.drawString(MARGIN + 40*mm, y, f"{score}")
 
     y -= 7*mm
     c.setFont("Helvetica-Bold", 12)
