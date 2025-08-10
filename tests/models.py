@@ -300,7 +300,7 @@ class Rash(models.Model):
 
 
             excel_buffer = BytesIO()
-            df.to_excel(excel_buffer, index=False)
+            df.to_excel(excel_buffer)
             excel_buffer.seek(0)
 
             self.file.save("results.xlsx", ContentFile(excel_buffer.read()), save=False)
