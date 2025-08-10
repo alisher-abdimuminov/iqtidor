@@ -303,7 +303,7 @@ class Rash(models.Model):
             df.to_excel(excel_buffer, index=False)
             excel_buffer.seek(0)
 
-            self.file.save("results.xlsx", ContentFile(excel_buffer.read()))
+            self.file.save("results.xlsx", ContentFile(excel_buffer.read()), save=False)
             self.status = "done"
 
         super().save(*args, **kwargs)
