@@ -467,7 +467,7 @@ def save_cefr_result(request: HttpRequest, pk: int):
     teacher = request.data.get("teacher")
 
     cefr = Cefr.objects.filter(pk=pk)
-    teacher = User.objects.filter(pk=pk)
+    teacher = User.objects.filter(pk=teacher)
 
     if not cefr:
         return Response({"status": "error", "error": "cefr_not_found", "data": None})
