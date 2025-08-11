@@ -129,9 +129,6 @@ def purchase_dtm(request: HttpRequest, pk: int):
 
     dtm_obj = dtm_obj.first()
 
-    if dtm_obj.group:
-        return Response({"status": "error", "error": "dtm_for_group", "data": None})
-
     if not dtm_obj.is_public and (user not in dtm_obj.participants.all()):
         if dtm_obj.price <= user.balance:
             user.balance = user.balance - dtm_obj.price
@@ -234,9 +231,6 @@ def purchase_cefr(request: HttpRequest, pk: int):
         )
 
     cefr_obj = cefr_obj.first()
-
-    if cefr_obj.group:
-        return Response({"status": "error", "error": "cefr_for_group", "data": None})
 
     if not cefr_obj.is_public and (user not in cefr_obj.participants.all()):
         if cefr_obj.price <= user.balance:
