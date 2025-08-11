@@ -470,12 +470,20 @@ def save_dtm_result(request: HttpRequest, pk: int):
 def save_cefr_result(request: HttpRequest, pk: int):
     user: User = request.user
     cases = request.data.get("cases")
+    teacher = request.data.get("teacher")
+
     cefr = Cefr.objects.filter(pk=pk)
+    teacher = User.objects.filter(pk=pk)
 
     if not cefr:
         return Response({"status": "error", "error": "cefr_not_found", "data": None})
+    
+    if not teacher:
+        return Response({"status": "error", "error": "teacher_not_found", "data": None})
 
     cefr = cefr.first()
+    teacher = teacher.first()
+
 
     cefr_result = CEFRResult.objects.filter(author=user, cefr=cefr)
 
@@ -488,6 +496,7 @@ def save_cefr_result(request: HttpRequest, pk: int):
         author=user,
         cefr=cefr,
         cases=cases,
+        teacher=teacher,
     )
 
     return Response({"status": "success", "error": None, "data": None})
