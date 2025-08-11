@@ -1,14 +1,14 @@
-from uuid import uuid4
 import numpy as np
 import pandas as pd
 from io import BytesIO
+from uuid import uuid4
 from django.db import models
 from django.core.files.base import ContentFile
 
 
 from utils.generate_certificate import generate_certificate
 
-from users.models import User, Group
+from users.models import User
 
 
 TEST_TYPE = (
@@ -190,6 +190,10 @@ class Banner(models.Model):
 
     def __str__(self):
         return str(self.description)
+    
+    class Meta:
+        verbose_name = "E'lon"
+        verbose_name_plural = "E'lonlar"
 
 
 class DTMResult(models.Model):
@@ -206,6 +210,10 @@ class DTMResult(models.Model):
 
     def __str__(self):
         return str(self.status)
+    
+    class Meta:
+        verbose_name = "DTM natija"
+        verbose_name_plural = "DTM natijalar"
 
 
 class CEFRResult(models.Model):
@@ -234,6 +242,10 @@ class CEFRResult(models.Model):
 
     def __str__(self):
         return str(self.status)
+    
+    class Meta:
+        verbose_name = "CEFR natija"
+        verbose_name_plural = "CEFR natijalar"
 
 
 class Rash(models.Model):
@@ -408,3 +420,7 @@ class Rash(models.Model):
             self.status = "done"
 
         super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "RASH"
+        verbose_name_plural = "RASH"

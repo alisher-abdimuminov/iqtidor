@@ -1,5 +1,7 @@
 from pathlib import Path
 from decouple import config
+from django.templatetags.static import static
+from django.urls import reverse_lazy
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,6 +17,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "unfold",
+    "unfold.contrib.filters",
     "unfold.contrib.forms",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -112,4 +115,135 @@ PAYME_KEY = config("PAYME_KEY")
 
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
+}
+
+UNFOLD = {
+    "SITE_TITLE": "Admin Panel",
+    "SITE_HEADER": "Iqtidor Academy",
+    "SITE_SUBHEADER": "Admin Panel",
+    "SITE_ICON": {
+        "light": lambda request: "https://i.imgur.com/Bz2ohb1.png",
+        "dark": lambda request: "https://i.imgur.com/Bz2ohb1.png"
+    },
+    "SHOW_HISTORY": True,
+    "SITE_DROPDOWN": [
+        {
+            "icon": "payment",
+            "title": "PayMe",
+            "link": "https://merchant.payme.uz"
+        },
+    ],
+
+    "LOGIN": {
+        "title": "Kirish",
+        "image": lambda request: "https://i.imgur.com/Bz2ohb1.png",
+    },
+
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": "Boshqaruv",
+                "items": [
+                    {
+                        "title": "Foydalanuvchilar",
+                        "icon": "manage_accounts",
+                        "link": reverse_lazy("admin:users_user_changelist"),
+                    },
+                    {
+                        "title": "Guruhlar",
+                        "icon": "group",
+                        "link": reverse_lazy("admin:users_group_changelist"),
+                    },
+                    {
+                        "title": "To'lovlar",
+                        "icon": "receipt",
+                        "link": reverse_lazy("admin:users_transaction_changelist")
+                    },
+                    {
+                        "title": "RASH",
+                        "icon": "functions",
+                        "link": reverse_lazy("admin:tests_rash_changelist")
+                    },
+                    {
+                        "title": "Fanlar",
+                        "icon": "calculate",
+                        "link": reverse_lazy("admin:tests_subject_changelist")
+                    },
+                    {
+                        "title": "E'lonlar",
+                        "icon": "campaign",
+                        "link": reverse_lazy("admin:tests_banner_changelist")
+                    }
+                ]
+            },
+            {
+                "title": "DTM",
+                "separator": True,
+                "collapsable": True,
+                "items": [
+                    {
+                        "title": "DTMlar",
+                        "icon": "checklist",
+                        "link": reverse_lazy("admin:tests_dtm_changelist"),
+                    },
+                    {
+                        "title": "Bloklar",
+                        "icon": "grid_view",
+                        "link": reverse_lazy("admin:tests_block_changelist"),
+                    },
+                    {
+                        "title": "Savollar",
+                        "icon": "grid_view",
+                        "link": reverse_lazy("admin:tests_test_changelist"),
+                    },
+                    {
+                        "title": "Natijalari",
+                        "icon": "list",
+                        "link": reverse_lazy("admin:tests_dtmresult_changelist"),
+                    }
+                ]
+            },
+            {
+                "title": "CEFR",
+                "separator": True,
+                "collapsable": True,
+                "items": [
+                    {
+                        "title": "CEFRlar",
+                        "icon": "check_box",
+                        "link": reverse_lazy("admin:tests_cefr_changelist"),
+                    },
+                    {
+                        "title": "Savollar",
+                        "icon": "grid_view",
+                        "link": reverse_lazy("admin:tests_question_changelist"),
+                    },
+                    {
+                        "title": "Natijalari",
+                        "icon": "list",
+                        "link": reverse_lazy("admin:tests_cefrresult_changelist"),
+                    },
+                ]
+            },
+            {
+                "title": "Xavfsizlik",
+                "separator": True,
+                "collapsable": True,
+                "items": [
+                    {
+                        "title": "Ruxsatlar",
+                        "icon": "security",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+                    {
+                        "title": "Tokenlar",
+                        "icon": "security",
+                        "link": reverse_lazy("admin:authtoken_token_changelist"),
+                    }
+                ]
+            }
+        ]
+    }
 }

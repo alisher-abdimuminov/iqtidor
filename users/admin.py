@@ -1,9 +1,17 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
+from rest_framework.authtoken.models import Token
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
+
 from .models import User, Transaction, Group
+
+
+@admin.register(Token)
+class TokenAdmin(ModelAdmin):
+    list_display = ('key', 'user', 'created')
+    search_fields = ('key', 'user__username')
 
 
 @admin.register(User)
