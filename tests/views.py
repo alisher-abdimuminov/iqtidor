@@ -593,9 +593,9 @@ def dtm_statistics(request: HttpRequest, pk: int):
         .order_by("-points")
         .values(
             "teacher_id",
-            "teacher_first_name",
-            "teacher_last_name",
-            "teacher_phone",
+            "teacher__first_name",
+            "teacher__last_name",
+            "teacher__phone",
             "teacher_points",
         )
     )
