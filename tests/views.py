@@ -567,7 +567,13 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     by_group = (
-        Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points", output_field=DecimalField()), Value(0), output_field=DecimalField()))
+        Group.objects.annotate(
+            points=Coalesce(
+                Sum("members__dtmresult__points", output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            )
+        )
         .order_by("-points")
         .values(
             "id",
@@ -577,10 +583,21 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     by_teacher = (
-        results
-        .annotate(points=Coalesce(Sum("points", output_field=DecimalField()), Value(0), output_field=DecimalField()))
+        results.annotate(
+            teacher_points=Coalesce(
+                Sum("points", output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            )
+        )
         .order_by("-points")
-        .values("teacher_id", "teacher_first_name", "teacher_last_name", "teacher_phone", "teacher_points")
+        .values(
+            "teacher_id",
+            "teacher_first_name",
+            "teacher_last_name",
+            "teacher_phone",
+            "teacher_points",
+        )
     )
 
     return Response(
