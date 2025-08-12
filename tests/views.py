@@ -563,11 +563,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
     results = DTMResult.objects.filter(dtm=dtm)
 
     by_student = results.order_by("-points").values(
-        id="author__id", 
-        first_name="author__first_name", 
-        last_name="author__last_name", 
-        points="points", 
-        status="status"
+        "author__id", "author__first_name", "author__last_name", "points", "status"
     )
 
     by_group = (
@@ -597,11 +593,11 @@ def dtm_statistics(request: HttpRequest, pk: int):
         )
         .order_by("-points")
         .values(
-            id="teacher_id",
-            first_name="teacher__first_name",
-            last_name="teacher__last_name",
-            phone="teacher__phone",
-            points="teacher_points",
+            "teacher_id",
+            "teacher__first_name",
+            "teacher__last_name",
+            "teacher__phone",
+            "teacher_points",
         )
     )
 
