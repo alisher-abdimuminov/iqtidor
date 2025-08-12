@@ -649,7 +649,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
         .values(
             "id",
             "name",
-            "rash",
+            # "rash",
         )
         .annotate(
             rash=Coalesce(
@@ -668,7 +668,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
             "teacher__first_name",
             "teacher__last_name",
             "teacher__phone",
-            "teacher_rash",
+            # "teacher_rash",
         )
         .annotate(
             teacher_rash=Coalesce(
