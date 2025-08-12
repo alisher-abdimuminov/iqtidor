@@ -567,17 +567,18 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     by_group = (
-        results.annotate(
-            group_points=Coalesce(
-                Sum("points", output_field=DecimalField()),
+        Group.objects.filter(members__dtmresult__dtm_id=dtm.pk)
+        .annotate(
+            points=Coalesce(
+                Sum("members__dtmresult__points", output_field=DecimalField()),
                 Value(0),
                 output_field=DecimalField(),
             )
         )
         .order_by("-points")
         .values(
-            "author__group__id",
-            "author__group__name",
+            "id",
+            "name",
             "group_points",
         )
     )
