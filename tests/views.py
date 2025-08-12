@@ -566,7 +566,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     groups_ranked = (
-        Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points"), Value(0)))
+        Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points"), Value(0), output_field=DecimalField))
         .order_by("-points")
         .values(
             "id",
