@@ -579,7 +579,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
         .values(
             "id",
             "name",
-            "group_points",
+            "points",
         )
     )
 
