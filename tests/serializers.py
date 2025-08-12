@@ -225,14 +225,14 @@ class BannerSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         dtm = obj.dtm
         if dtm:
-            return DtmsSerializer(dtm, context={ "request": request })
+            return DtmsSerializer(dtm, context={ "request": request }).data
         return None
     
     def get_cefr(self, obj: Banner):
         request = self.context.get("request")
         cefr = obj.cefr
         if cefr:
-            return CefrsSerializer(cefr, context={ "request": request })
+            return CefrsSerializer(cefr, context={ "request": request }).data
         return None
     
     class Meta:
