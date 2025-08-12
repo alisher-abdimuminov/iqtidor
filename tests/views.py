@@ -624,7 +624,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
     )
 
     teachers_ranked = (
-        User.objects
+        CEFRResult.objects
         .annotate(total_points=Sum('rash'), result_count=Count('id'))
         .order_by('-total_points', '-result_count')
         .values('teacher__id', 'teacher__first_name', 'teacher__last_name')
