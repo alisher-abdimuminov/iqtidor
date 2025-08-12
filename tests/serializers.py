@@ -249,6 +249,7 @@ class BannerSerializer(serializers.ModelSerializer):
 class CefrsSerializer(serializers.ModelSerializer):
     is_open = serializers.SerializerMethodField("get_is_open")
     result = serializers.SerializerMethodField("get_result")
+    count_questions = serializers.SerializerMethodField("get_count_questions")
 
     def get_is_open(self, obj: Cefr):
         request: HttpRequest = self.context.get("request")
@@ -265,6 +266,9 @@ class CefrsSerializer(serializers.ModelSerializer):
             result = result.first()
             return CEFRResultSerializer(result).data
         return None
+    
+    def get_count_questions(self, obj: Cefr):
+        return Question.objects.filter(cefr=obj).count()
 
     class Meta:
         model = Cefr
@@ -279,6 +283,7 @@ class CefrsSerializer(serializers.ModelSerializer):
             "is_open",
             "result",
             "is_public",
+            "count_questions",
         )
 
 
