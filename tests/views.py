@@ -565,17 +565,17 @@ def dtm_statistics(request: HttpRequest, pk: int):
 
     groups_ranked = (
         Group.objects
-        .annotate(total_points=Sum('members__dtmresult__points'))
-        .order_by('-total_points', 'name')
-        .values('id', 'name', 'total_points')
+        .annotate(points=Sum('members__dtmresult__points'))
+        .order_by('-points')
+        .values('id', 'name', 'points', )
     )
 
     teachers_ranked = (
-        DTMResult.objects
-        .values('teacher__id', 'teacher__first_name', 'teacher__last_name', 'teacher__phone')
-        .annotate(total_points=Sum('points'), result_count=Count('id'))
-        .order_by('-total_points', '-result_count')
-        .values('teacher__id', 'teacher__first_name', 'teacher__last_name')
+        User.objects
+        .filter(role="teacher")
+        .annotate(points=Sum('dtmresult__points'))
+        .order_by('-points')
+        .values('id', 'first_name', 'last_name', 'phone', 'points')
     )
 
     return Response({
