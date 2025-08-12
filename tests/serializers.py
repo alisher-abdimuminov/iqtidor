@@ -17,18 +17,6 @@ from .models import (
 )
 
 
-class BannerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Banner
-        fields = (
-            "id",
-            "image",
-            "dtm",
-            "cefr",
-            "is_active",
-        )
-
-
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
@@ -226,6 +214,35 @@ class CefrSerializer(serializers.ModelSerializer):
             "is_open",
             "result",
             "is_public",
+        )
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    dtm = serializers.SerializerMethodField()
+    cefr = serializers.SerializerMethodField()
+
+    def get_dtm(self, obj: Banner):
+        request = self.context.get("request")
+        dtm = obj.dtm
+        if dtm:
+            return DtmsSerializer(dtm, context={ "request": request })
+        return None
+    
+    def get_cefr(self, obj: Banner):
+        request = self.context.get("request")
+        cefr = obj.cefr
+        if cefr:
+            return CefrsSerializer(cefr, context={ "request": request })
+        return None
+    
+    class Meta:
+        model = Banner
+        fields = (
+            "id",
+            "image",
+            "dtm",
+            "cefr",
+            "is_active",
         )
 
 
