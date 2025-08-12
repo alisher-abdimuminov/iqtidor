@@ -132,38 +132,37 @@ def signup(request: HttpRequest):
 
     if not phone:
         return Response(
-            {"status": "error", "error": "phone_required", "data": None}, status=400
+            {"status": "error", "error": "phone_required", "data": None}
         )
 
     if not first_name:
         return Response(
             {"status": "error", "error": "first_name_required", "data": None},
-            status=400,
         )
 
     if not last_name:
         return Response(
-            {"status": "error", "error": "last_name_required", "data": None}, status=400
+            {"status": "error", "error": "last_name_required", "data": None}
         )
 
     if not city:
         return Response(
-            {"status": "error", "code": "city_required", "data": None}, status=400
+            {"status": "error", "code": "city_required", "data": None}
         )
 
     if not town:
         return Response(
-            {"status": "error", "error": "town_required", "data": None}, status=400
+            {"status": "error", "error": "town_required", "data": None}
         )
 
     if not village:
         return Response(
-            {"status": "error", "error": "village_required", "data": None}, status=400
+            {"status": "error", "error": "village_required", "data": None}
         )
 
     if not school:
         return Response(
-            {"status": "error", "error": "scholl_required", "data": None}, status=400
+            {"status": "error", "error": "scholl_required", "data": None}
         )
 
     if not password:
@@ -173,7 +172,7 @@ def signup(request: HttpRequest):
 
     if user.exists():
         return Response(
-            {"status": "error", "error": "phone_exists", "data": None}, status=400
+            {"status": "error", "error": "phone_exists", "data": None}
         )
 
     user = User.objects.create(
@@ -206,7 +205,7 @@ def login(request: HttpRequest):
 
     if not user.exists():
         return Response(
-            {"status": "error", "error": "phone_not_found", "data": None}, status=400
+            {"status": "error", "error": "phone_not_found", "data": None}
         )
 
     user = user.first()

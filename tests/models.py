@@ -394,9 +394,7 @@ class Rash(models.Model):
                                     last_name=cefr_result.author.last_name,
                                     middle_name=cefr_result.author.middle_name,
                                     phone=cefr_result.author.phone,
-                                    photo=cefr_result.author.image.url
-                                    if cefr_result.author.image
-                                    else "bgless.png",
+                                    photo="bgless.png",
                                     id=str(cefr_result.cefr.uuid),
                                     subject=cefr_result.cefr.subject.name,
                                     points="%.2f" % cefr_result.rash,
