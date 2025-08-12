@@ -568,6 +568,10 @@ def dtm_statistics(request: HttpRequest, pk: int):
 
     by_group = (
         Group.objects.filter(members__dtmresult__dtm_id=dtm.pk)
+        .values(
+            "id",
+            "name",
+        )
         .annotate(
             points=Coalesce(
                 Sum("members__dtmresult__points", output_field=DecimalField()),
@@ -576,15 +580,17 @@ def dtm_statistics(request: HttpRequest, pk: int):
             )
         )
         .order_by("-points")
-        .values(
-            "id",
-            "name",
-            "points",
-        )
     )
 
     by_teacher = (
-        results.annotate(
+        results
+        .values(
+            "teacher_id",
+            "teacher__first_name",
+            "teacher__last_name",
+            "teacher__phone",
+        )
+        .annotate(
             teacher_points=Coalesce(
                 Sum("points", output_field=DecimalField()),
                 Value(0),
@@ -592,13 +598,6 @@ def dtm_statistics(request: HttpRequest, pk: int):
             )
         )
         .order_by("-points")
-        .values(
-            "teacher_id",
-            "teacher__first_name",
-            "teacher__last_name",
-            "teacher__phone",
-            "teacher_points",
-        )
     )
 
     return Response(
@@ -649,7 +648,6 @@ def cefr_statistics(request: HttpRequest, pk: int):
         .values(
             "id",
             "name",
-            # "rash",
         )
         .annotate(
             rash=Coalesce(
@@ -668,7 +666,6 @@ def cefr_statistics(request: HttpRequest, pk: int):
             "teacher__first_name",
             "teacher__last_name",
             "teacher__phone",
-            # "teacher_rash",
         )
         .annotate(
             teacher_rash=Coalesce(
