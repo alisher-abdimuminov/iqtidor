@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from django.core.files.base import ContentFile
+from django.db.models.functions import Coalesce
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authentication import TokenAuthentication
@@ -565,7 +566,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     groups_ranked = (
-        Group.objects.annotate(points=Sum("members__dtmresult__points") or 0)
+        Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points"), 0))
         .order_by("-points")
         .values(
             "id",
@@ -576,7 +577,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
 
     teachers_ranked = (
         User.objects.filter(role="teacher")
-        .annotate(points=Sum("dtmresult__points") or 0)
+        .annotate(points=Coalesce(Sum("dtmresult__points"), 0))
         .order_by("-points")
         .values("id", "first_name", "last_name", "phone", "points")
     )
