@@ -3,7 +3,7 @@ from drf_yasg import openapi
 from rest_framework import generics
 from django.http import HttpRequest
 from rest_framework import decorators
-from django.db.models import Sum, Count, DecimalField
+from django.db.models import Sum, Count, DecimalField, Value
 from datetime import datetime, timedelta
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
@@ -566,7 +566,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     groups_ranked = (
-        Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points", output_field=DecimalField()), 0))
+        Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points"), Value(0)))
         .order_by("-points")
         .values(
             "id",
@@ -577,7 +577,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
 
     teachers_ranked = (
         User.objects.filter(role="teacher")
-        .annotate(points=Coalesce(Sum("dtmresult__points", output_field=DecimalField()), 0))
+        .annotate(points=Coalesce(Sum("dtmresult__points"), Value(0)))
         .order_by("-points")
         .values("id", "first_name", "last_name", "phone", "points")
     )
