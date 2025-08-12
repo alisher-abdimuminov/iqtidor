@@ -471,13 +471,12 @@ def save_cefr_result(request: HttpRequest, pk: int):
 
     if not cefr:
         return Response({"status": "error", "error": "cefr_not_found", "data": None})
-    
+
     if not teacher:
         return Response({"status": "error", "error": "teacher_not_found", "data": None})
 
     cefr = cefr.first()
     teacher = teacher.first()
-
 
     cefr_result = CEFRResult.objects.filter(author=user, cefr=cefr)
 
@@ -561,32 +560,38 @@ def dtm_statistics(request: HttpRequest, pk: int):
 
     dtm = dtm.first()
 
-    top_results = DTMResult.objects.order_by('-points', '-created').values('author__id', 'author__first_name', 'author__last_name', 'points', 'status')
+    top_results = DTMResult.objects.order_by("-points").values(
+        "author__id", "author__first_name", "author__last_name", "points", "status"
+    )
 
     groups_ranked = (
-        Group.objects
-        .annotate(points=Sum('members__dtmresult__points'))
-        .order_by('-points')
-        .values('id', 'name', 'points', )
+        Group.objects.annotate(points=Sum("members__dtmresult__points") or 0)
+        .order_by("-points")
+        .values(
+            "id",
+            "name",
+            "points",
+        )
     )
 
     teachers_ranked = (
-        User.objects
-        .filter(role="teacher")
-        .annotate(points=Sum('dtmresult__points'))
-        .order_by('-points')
-        .values('id', 'first_name', 'last_name', 'phone', 'points')
+        User.objects.filter(role="teacher")
+        .annotate(points=Sum("dtmresult__points") or 0)
+        .order_by("-points")
+        .values("id", "first_name", "last_name", "phone", "points")
     )
 
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": {
-            "by_point": list(top_results),
-            "by_group": list(groups_ranked),
-            "by_teacher": list(teachers_ranked)
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": {
+                "by_point": list(top_results),
+                "by_group": list(groups_ranked),
+                "by_teacher": list(teachers_ranked),
+            },
         }
-    })
+    )
 
 
 @swagger_auto_schema(
@@ -614,29 +619,30 @@ def cefr_statistics(request: HttpRequest, pk: int):
 
     cefr = cefr.first()
 
-    top_results = CEFRResult.objects.order_by('-rash', '-created').values('author__id', 'author__first_name', 'author__last_name', 'rash', 'degree')
+    top_results = CEFRResult.objects.order_by("-rash", "-created").values(
+        "author__id", "author__first_name", "author__last_name", "rash", "degree"
+    )
 
     groups_ranked = (
-        Group.objects
-        .annotate(total_points=Sum('members__cefrresult__rash'))
-        .order_by('-total_points', 'name')
-        .values('id', 'name', 'total_points')
+        Group.objects.annotate(total_points=Sum("members__cefrresult__rash"))
+        .order_by("-total_points", "name")
+        .values("id", "name", "total_points")
     )
 
     teachers_ranked = (
-        CEFRResult.objects
-        .annotate(total_points=Sum('rash'), result_count=Count('id'))
-        .order_by('-total_points', '-result_count')
-        .values('teacher__id', 'teacher__first_name', 'teacher__last_name')
+        CEFRResult.objects.annotate(total_points=Sum("rash"), result_count=Count("id"))
+        .order_by("-total_points", "-result_count")
+        .values("teacher__id", "teacher__first_name", "teacher__last_name")
     )
 
-    return Response({
-        "status": "success",
-        "error": None,
-        "data": {
-            "by_point": list(top_results),
-            "by_group": list(groups_ranked),
-            "by_teacher": list(teachers_ranked)
+    return Response(
+        {
+            "status": "success",
+            "error": None,
+            "data": {
+                "by_point": list(top_results),
+                "by_group": list(groups_ranked),
+                "by_teacher": list(teachers_ranked),
+            },
         }
-    })
-
+    )
