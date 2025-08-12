@@ -669,7 +669,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
                 output_field=DecimalField(),
             )
         )
-        .order_by("-rash")
+        .order_by("-teacher_rash")
         .values(
             "teacher_id",
             "teacher__first_name",
