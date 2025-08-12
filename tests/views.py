@@ -560,12 +560,13 @@ def dtm_statistics(request: HttpRequest, pk: int):
         return Response({"status": "error", "error": "dtm_not_found", "data": None})
 
     dtm = dtm.first()
+    results = DTMResult.objects.filter(dtm=dtm)
 
-    top_results = dtm.order_by("-points").values(
+    by_student = results.order_by("-points").values(
         "author__id", "author__first_name", "author__last_name", "points", "status"
     )
 
-    groups_ranked = (
+    by_group = (
         Group.objects.annotate(points=Coalesce(Sum("members__dtmresult__points", output_field=DecimalField()), Value(0), output_field=DecimalField()))
         .order_by("-points")
         .values(
@@ -575,8 +576,8 @@ def dtm_statistics(request: HttpRequest, pk: int):
         )
     )
 
-    teachers_ranked = (
-        dtm
+    by_teacher = (
+        results
         .annotate(points=Coalesce(Sum("points", output_field=DecimalField()), Value(0), output_field=DecimalField()))
         .order_by("-points")
         .values("teacher_id", "teacher_first_name", "teacher_last_name", "teacher_phone", "teacher_points")
@@ -587,9 +588,9 @@ def dtm_statistics(request: HttpRequest, pk: int):
             "status": "success",
             "error": None,
             "data": {
-                "by_point": list(top_results),
-                "by_group": list(groups_ranked),
-                "by_teacher": list(teachers_ranked),
+                "by_student": list(by_student),
+                "by_group": list(by_group),
+                "by_teacher": list(by_teacher),
             },
         }
     )
