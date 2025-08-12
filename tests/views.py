@@ -646,6 +646,11 @@ def cefr_statistics(request: HttpRequest, pk: int):
 
     by_group = (
         Group.objects.filter(members__cefrresult__cefr_id=cefr.pk)
+        .values(
+            "id",
+            "name",
+            "rash",
+        )
         .annotate(
             rash=Coalesce(
                 Sum("members__cefrresult__rash", output_field=DecimalField()),
@@ -654,22 +659,10 @@ def cefr_statistics(request: HttpRequest, pk: int):
             )
         )
         .order_by("-rash")
-        .values(
-            "id",
-            "name",
-            "rash",
-        )
     )
 
     by_teacher = (
-        results.annotate(
-            teacher_rash=Coalesce(
-                Sum("rash", output_field=DecimalField()),
-                Value(0),
-                output_field=DecimalField(),
-            )
-        )
-        .order_by("-teacher_rash")
+        results
         .values(
             "teacher_id",
             "teacher__first_name",
@@ -677,6 +670,14 @@ def cefr_statistics(request: HttpRequest, pk: int):
             "teacher__phone",
             "teacher_rash",
         )
+        .annotate(
+            teacher_rash=Coalesce(
+                Sum("rash", output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            )
+        )
+        .order_by("-teacher_rash")
     )
 
     return Response(
