@@ -638,21 +638,45 @@ def cefr_statistics(request: HttpRequest, pk: int):
         return Response({"status": "error", "error": "cefr_not_found", "data": None})
 
     cefr = cefr.first()
+    results = CEFRResult.objects.filter(cefr=cefr)
 
-    top_results = CEFRResult.objects.order_by("-rash", "-created").values(
-        "author__id", "author__first_name", "author__last_name", "rash", "degree"
+    by_student = results.order_by("-rash").values(
+        "author__id", "author__first_name", "author__last_name", "rash", "degree",
     )
 
-    groups_ranked = (
-        Group.objects.annotate(total_points=Sum("members__cefrresult__rash"))
-        .order_by("-total_points", "name")
-        .values("id", "name", "total_points")
+    by_group = (
+        Group.objects.filter(members__cefrresult__cefr_id=cefr.pk)
+        .annotate(
+            rash=Coalesce(
+                Sum("members__cefrresult__rash", output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            )
+        )
+        .order_by("-points")
+        .values(
+            "id",
+            "name",
+            "rash",
+        )
     )
 
-    teachers_ranked = (
-        CEFRResult.objects.annotate(total_points=Sum("rash"), result_count=Count("id"))
-        .order_by("-total_points", "-result_count")
-        .values("teacher__id", "teacher__first_name", "teacher__last_name")
+    by_teacher = (
+        results.annotate(
+            teacher_rash=Coalesce(
+                Sum("rash", output_field=DecimalField()),
+                Value(0),
+                output_field=DecimalField(),
+            )
+        )
+        .order_by("-rash")
+        .values(
+            "teacher_id",
+            "teacher__first_name",
+            "teacher__last_name",
+            "teacher__phone",
+            "teacher_rash",
+        )
     )
 
     return Response(
@@ -660,9 +684,9 @@ def cefr_statistics(request: HttpRequest, pk: int):
             "status": "success",
             "error": None,
             "data": {
-                "by_point": list(top_results),
-                "by_group": list(groups_ranked),
-                "by_teacher": list(teachers_ranked),
+                "by_student": list(by_student),
+                "by_group": list(by_group),
+                "by_teacher": list(by_teacher),
             },
         }
     )
