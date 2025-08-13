@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 from io import BytesIO
@@ -382,26 +383,50 @@ class Rash(models.Model):
                                 according_to_the_answers_found
                             ],
                         )
-                        print("deviation", deviations[deviation], type(deviations[deviation]))
+                        print(
+                            "deviation",
+                            deviations[deviation],
+                            type(deviations[deviation]),
+                        )
                         print("level", by_difficulty_levels[by_difficulty_level])
                         print("rash", rashs[rash])
                         print("degree", degrees[degree])
 
                         cefr_result.correct_answers = correct_answers[correct_answer]
-                        cefr_result.ratio_of_total_questions = ratio_of_total_questions[
-                            ratio_of_total_question
-                        ]
+                        cefr_result.ratio_of_total_questions = (
+                            ratio_of_total_questions[ratio_of_total_question]
+                            if not math.isnan(
+                                ratio_of_total_questions[ratio_of_total_question]
+                            )
+                            else 0
+                        )
                         cefr_result.according_to_the_answers_found = (
                             according_to_the_answers_founds[
                                 according_to_the_answers_found
                             ]
+                            if not math.isnan(
+                                according_to_the_answers_founds[
+                                    according_to_the_answers_found
+                                ]
+                            )
+                            else 0
                         )
-                        cefr_result.deviation = deviations[deviation] if isinstance(deviations[deviation], float) or isinstance(deviations[deviation], int) else 0
-                        cefr_result.by_difficulty_level = by_difficulty_levels[
-                            by_difficulty_level
-                        ]
-                        cefr_result.rash = rashs[rash]
-                        cefr_result.degree = degrees[degree]
+                        cefr_result.deviation = (
+                            deviations[deviation]
+                            if not math.isnan(deviations[deviation])
+                            else 0
+                        )
+                        cefr_result.by_difficulty_level = (
+                            by_difficulty_levels[by_difficulty_level]
+                            if not math.isnan(by_difficulty_levels[by_difficulty_level])
+                            else 0
+                        )
+                        cefr_result.rash = (
+                            rashs[rash] if not math.isnan(rashs[rash]) else 0
+                        )
+                        cefr_result.degree = (
+                            degrees[degree] if not math.isnan(degrees[degree]) else 0
+                        )
 
                         cefr_result.certificate.save(
                             f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
