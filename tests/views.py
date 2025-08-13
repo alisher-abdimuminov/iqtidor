@@ -287,7 +287,7 @@ def get_statistics(request: HttpRequest):
     start_of_week = now - timedelta(days=now.weekday())
     end_of_week = start_of_week + timedelta(days=6)
 
-    dtms = DTMResult.objects.all()
+    dtms = DTMResult.objects.filter(author=user)
 
     if filter_by == "monthly":
         dtms = DTMResult.objects.filter(
@@ -300,7 +300,7 @@ def get_statistics(request: HttpRequest):
             author=user,
         )
 
-    cefrs = CEFRResult.objects.all()
+    cefrs = CEFRResult.objects.filter(author=user)
 
     if filter_by == "monthly":
         cefrs = CEFRResult.objects.filter(
@@ -583,8 +583,7 @@ def dtm_statistics(request: HttpRequest, pk: int):
     )
 
     by_teacher = (
-        results
-        .values(
+        results.values(
             "teacher_id",
             "teacher__first_name",
             "teacher__last_name",
@@ -640,7 +639,11 @@ def cefr_statistics(request: HttpRequest, pk: int):
     results = CEFRResult.objects.filter(cefr=cefr)
 
     by_student = results.order_by("-rash").values(
-        "author__id", "author__first_name", "author__last_name", "rash", "degree",
+        "author__id",
+        "author__first_name",
+        "author__last_name",
+        "rash",
+        "degree",
     )
 
     by_group = (
@@ -660,8 +663,7 @@ def cefr_statistics(request: HttpRequest, pk: int):
     )
 
     by_teacher = (
-        results
-        .values(
+        results.values(
             "teacher_id",
             "teacher__first_name",
             "teacher__last_name",
