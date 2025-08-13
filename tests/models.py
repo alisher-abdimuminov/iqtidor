@@ -190,7 +190,7 @@ class Banner(models.Model):
 
     def __str__(self):
         return str(self.description)
-    
+
     class Meta:
         verbose_name = "E'lon"
         verbose_name_plural = "E'lonlar"
@@ -198,7 +198,9 @@ class Banner(models.Model):
 
 class DTMResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="dtm_result_teacher")
+    teacher = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="dtm_result_teacher"
+    )
     dtm = models.ForeignKey(Dtm, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
     points = models.DecimalField(max_digits=10, decimal_places=2)
@@ -210,7 +212,7 @@ class DTMResult(models.Model):
 
     def __str__(self):
         return str(self.status)
-    
+
     class Meta:
         verbose_name = "DTM natija"
         verbose_name_plural = "DTM natijalar"
@@ -218,7 +220,9 @@ class DTMResult(models.Model):
 
 class CEFRResult(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="cefr_result_teacher")
+    teacher = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="cefr_result_teacher"
+    )
     cefr = models.ForeignKey(Cefr, on_delete=models.CASCADE)
     cases = models.JSONField(default=dict)
     correct_answers = models.IntegerField(default=0)
@@ -242,7 +246,7 @@ class CEFRResult(models.Model):
 
     def __str__(self):
         return str(self.status)
-    
+
     class Meta:
         verbose_name = "CEFR natija"
         verbose_name_plural = "CEFR natijalar"
@@ -369,6 +373,20 @@ class Rash(models.Model):
                     if cefr_result:
                         cefr_result = cefr_result.first()
 
+                        print(
+                            "ratio", ratio_of_total_questions[ratio_of_total_question]
+                        )
+                        print(
+                            "according",
+                            according_to_the_answers_founds[
+                                according_to_the_answers_found
+                            ],
+                        )
+                        print("deviation", deviations[deviation])
+                        print("level", by_difficulty_levels[by_difficulty_level])
+                        print("rash", rashs[rash])
+                        print("degree", degrees[degree])
+
                         cefr_result.correct_answers = correct_answers[correct_answer]
                         cefr_result.ratio_of_total_questions = ratio_of_total_questions[
                             ratio_of_total_question
@@ -385,29 +403,29 @@ class Rash(models.Model):
                         cefr_result.rash = rashs[rash]
                         cefr_result.degree = degrees[degree]
 
-                        # cefr_result.certificate.save(
-                        #     f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
-                        #     ContentFile(
-                        #         generate_certificate(
-                        #             logo="bgless.png",
-                        #             first_name=cefr_result.author.first_name,
-                        #             last_name=cefr_result.author.last_name,
-                        #             middle_name=cefr_result.author.middle_name,
-                        #             phone=cefr_result.author.phone,
-                        #             photo="bgless.png",
-                        #             id=str(cefr_result.cefr.uuid),
-                        #             subject=cefr_result.cefr.subject.name,
-                        #             points="%.2f" % cefr_result.rash,
-                        #             percentage="%.2f"
-                        #             % cefr_result.ratio_of_total_questions,
-                        #             degree=cefr_result.degree,
-                        #             date=cefr_result.created.strftime("%d/%m/%Y"),
-                        #             director="Sanjar Sultonov",
-                        #         ),
-                        #         f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
-                        #     ),
-                        #     save=False
-                        # )
+                        cefr_result.certificate.save(
+                            f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
+                            ContentFile(
+                                generate_certificate(
+                                    logo="bgless.png",
+                                    first_name=cefr_result.author.first_name,
+                                    last_name=cefr_result.author.last_name,
+                                    middle_name=cefr_result.author.middle_name,
+                                    phone=cefr_result.author.phone,
+                                    photo="bgless.png",
+                                    id=str(cefr_result.cefr.uuid),
+                                    subject=cefr_result.cefr.subject.name,
+                                    points="%.2f" % cefr_result.rash,
+                                    percentage="%.2f"
+                                    % cefr_result.ratio_of_total_questions,
+                                    degree=cefr_result.degree,
+                                    date=cefr_result.created.strftime("%d/%m/%Y"),
+                                    director="Sanjar Sultonov",
+                                ),
+                                f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
+                            ),
+                            save=False,
+                        )
 
                         cefr_result.save()
 
