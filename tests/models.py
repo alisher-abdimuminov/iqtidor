@@ -385,29 +385,29 @@ class Rash(models.Model):
                         cefr_result.rash = rashs[rash]
                         cefr_result.degree = degrees[degree]
 
-                        cefr_result.certificate.save(
-                            f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
-                            ContentFile(
-                                generate_certificate(
-                                    logo="bgless.png",
-                                    first_name=cefr_result.author.first_name,
-                                    last_name=cefr_result.author.last_name,
-                                    middle_name=cefr_result.author.middle_name,
-                                    phone=cefr_result.author.phone,
-                                    photo="bgless.png",
-                                    id=str(cefr_result.cefr.uuid),
-                                    subject=cefr_result.cefr.subject.name,
-                                    points="%.2f" % cefr_result.rash,
-                                    percentage="%.2f"
-                                    % cefr_result.ratio_of_total_questions,
-                                    degree=cefr_result.degree,
-                                    date=cefr_result.created.strftime("%d/%m/%Y"),
-                                    director="Sanjar Sultonov",
-                                ),
-                                f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
-                            ),
-                            save=False
-                        )
+                        # cefr_result.certificate.save(
+                        #     f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
+                        #     ContentFile(
+                        #         generate_certificate(
+                        #             logo="bgless.png",
+                        #             first_name=cefr_result.author.first_name,
+                        #             last_name=cefr_result.author.last_name,
+                        #             middle_name=cefr_result.author.middle_name,
+                        #             phone=cefr_result.author.phone,
+                        #             photo="bgless.png",
+                        #             id=str(cefr_result.cefr.uuid),
+                        #             subject=cefr_result.cefr.subject.name,
+                        #             points="%.2f" % cefr_result.rash,
+                        #             percentage="%.2f"
+                        #             % cefr_result.ratio_of_total_questions,
+                        #             degree=cefr_result.degree,
+                        #             date=cefr_result.created.strftime("%d/%m/%Y"),
+                        #             director="Sanjar Sultonov",
+                        #         ),
+                        #         f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
+                        #     ),
+                        #     save=False
+                        # )
 
                         cefr_result.save()
 
