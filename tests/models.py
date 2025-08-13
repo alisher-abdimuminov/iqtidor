@@ -396,7 +396,7 @@ class Rash(models.Model):
                                 according_to_the_answers_found
                             ]
                         )
-                        cefr_result.deviation = deviations[deviation]
+                        cefr_result.deviation = deviations[deviation] if isinstance(deviations[deviation], float) or isinstance(deviations[deviation], int) else 0
                         cefr_result.by_difficulty_level = by_difficulty_levels[
                             by_difficulty_level
                         ]
