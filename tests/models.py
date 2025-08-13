@@ -406,6 +406,7 @@ class Rash(models.Model):
                                 ),
                                 f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
                             ),
+                            save=False
                         )
 
                         cefr_result.save()
