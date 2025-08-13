@@ -424,9 +424,7 @@ class Rash(models.Model):
                         cefr_result.rash = (
                             rashs[rash] if not math.isnan(rashs[rash]) else 0
                         )
-                        cefr_result.degree = (
-                            degrees[degree] if not math.isnan(degrees[degree]) else 0
-                        )
+                        cefr_result.degree = degrees[degree]
 
                         cefr_result.certificate.save(
                             f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
