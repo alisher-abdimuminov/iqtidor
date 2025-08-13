@@ -382,7 +382,7 @@ class Rash(models.Model):
                                 according_to_the_answers_found
                             ],
                         )
-                        print("deviation", deviations[deviation])
+                        print("deviation", deviations[deviation], type(deviations[deviation]))
                         print("level", by_difficulty_levels[by_difficulty_level])
                         print("rash", rashs[rash])
                         print("degree", degrees[degree])
