@@ -183,7 +183,7 @@ class CefrSerializer(serializers.ModelSerializer):
     result = serializers.SerializerMethodField("get_result")
 
     def get_questions(self, obj: Cefr):
-        questions = Question.objects.filter(cefr=obj)
+        questions = Question.objects.filter(cefr=obj).order_by("id")
         return QuestionSerializer(questions, many=True).data
 
     def get_is_open(self, obj: Dtm):
