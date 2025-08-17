@@ -375,7 +375,7 @@ class Rash(models.Model):
                     if cefr_result:
                         cefr_result = cefr_result.first()
 
-                        percentage = ((rashs[rash] if not math.isnan(rashs[rash]) else 1) / 65) * 100 if (rashs[rash] if not math.isnan(rashs[rash]) else 0) > 65 else 100 
+                        percentage = ((rashs[rash] if not math.isnan(rashs[rash]) else 1) / 65) * 100 if (rashs[rash] if not math.isnan(rashs[rash]) else 0) < 65 else 100 
 
                         cefr_result.correct_answers = correct_answers[correct_answer]
                         cefr_result.ratio_of_total_questions = (
