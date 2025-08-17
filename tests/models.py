@@ -238,6 +238,7 @@ class CEFRResult(models.Model):
         max_digits=10, decimal_places=5, default=0
     )
     rash = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    percentage = models.DecimalField(max_digits=10, decimal_places=5, default=0)
     degree = models.CharField(max_length=5, choices=CEFR_DEGREE_TYPE, default="nc")
     status = models.CharField(max_length=20, choices=RESULT_TYPE, null=True, blank=True)
     certificate = models.FileField(upload_to="certificates", null=True, blank=True)
@@ -374,23 +375,7 @@ class Rash(models.Model):
                     if cefr_result:
                         cefr_result = cefr_result.first()
 
-                        print(
-                            "ratio", ratio_of_total_questions[ratio_of_total_question]
-                        )
-                        print(
-                            "according",
-                            according_to_the_answers_founds[
-                                according_to_the_answers_found
-                            ],
-                        )
-                        print(
-                            "deviation",
-                            deviations[deviation],
-                            type(deviations[deviation]),
-                        )
-                        print("level", by_difficulty_levels[by_difficulty_level])
-                        print("rash", rashs[rash])
-                        print("degree", degrees[degree])
+                        percentage = ((rashs[rash] if not math.isnan(rashs[rash]) else 1) / 65) * 100 if (rashs[rash] if not math.isnan(rashs[rash]) else 0) > 65 else 100 
 
                         cefr_result.correct_answers = correct_answers[correct_answer]
                         cefr_result.ratio_of_total_questions = (
@@ -426,6 +411,8 @@ class Rash(models.Model):
                         )
                         cefr_result.degree = degrees[degree]
 
+                        cefr_result.percentage = percentage
+
                         cefr_result.certificate.save(
                             f"{cefr_result.author.first_name} {cefr_result.author.last_name}.pdf",
                             ContentFile(
@@ -440,7 +427,7 @@ class Rash(models.Model):
                                     subject=cefr_result.cefr.subject.name,
                                     points="%.2f" % cefr_result.rash,
                                     percentage="%.2f"
-                                    % cefr_result.ratio_of_total_questions,
+                                    % cefr_result.percentage,
                                     degree=cefr_result.degree,
                                     date=cefr_result.created.strftime("%d/%m/%Y"),
                                     director="Sanjar Sultonov",
