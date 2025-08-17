@@ -26,37 +26,24 @@ def generate_certificate(
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    c.setFillColorRGB(0.95, 0.90, 0.80)
-    c.rect(0, 0, width, height, stroke=0, fill=1)
-
-    bg_path = "bg.png"
+    bg_path = "new_bg.jpg"
     c.drawImage(bg_path, 0, 0, width=width, height=height, mask="auto")
 
     c.setFillColor(colors.black)
     c.setFont("Helvetica-Bold", 18)
 
-    c.drawImage(
-        logo,
-        width / 2 - 20 * mm,
-        height - 55 * mm,
-        width=40 * mm,
-        height=40 * mm,
-        preserveAspectRatio=True,
-        mask="auto",
-    )
-
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width / 2, height - 70 * mm, "Iqtidor Academy")
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width / 2, height - 83 * mm, "Iqtidor Academy")
 
     c.setFont("Helvetica-Bold", 13)
     c.drawCentredString(
         width / 2,
-        height - 80 * mm,
+        height - 93 * mm,
         "UMUMTA'LIM FANINI BILISH DARAJASI TO'G'RISIDA SERTIFIKAT",
     )
 
-    y = height - 100 * mm
-    c.setFont("Helvetica", 11)
+    y = height - 130 * mm
+    c.setFont("Helvetica", 15)
     c.drawString(30 * mm, y, f"Sertifikat raqami: {id}")
     y -= 8 * mm
     c.drawString(30 * mm, y, f"Talabaning shaxsiy kodi: {phone}")
@@ -67,18 +54,18 @@ def generate_certificate(
     y -= 8 * mm
     c.drawString(30 * mm, y, f"Otasining ismi: {middle_name}")
 
-    c.drawImage(
-        photo,
-        width - 50 * mm,
-        height - 120 * mm,
-        width=25 * mm,
-        height=30 * mm,
-        preserveAspectRatio=True,
-        mask="auto",
-    )
+    # c.drawImage(
+    #     photo,
+    #     width - 50 * mm,
+    #     height - 120 * mm,
+    #     width=25 * mm,
+    #     height=30 * mm,
+    #     preserveAspectRatio=True,
+    #     mask="auto",
+    # )
 
-    y -= 50 * mm
-    c.setFont("Helvetica-Bold", 11)
+    y -= 30 * mm
+    c.setFont("Helvetica-Bold", 15)
     c.drawString(30 * mm, y, f"Umumta'lim fani: {subject}")
     y -= 8 * mm
     c.drawString(30 * mm, y, f"Umumiy to'plagan ball: {points}")
@@ -89,10 +76,11 @@ def generate_certificate(
     y -= 8 * mm
     c.drawString(30 * mm, y, f"Sertifikat darajasi: {degree}")
 
+    c.setFont("Helvetica", 12)
     y -= 60 * mm
     c.drawString(30 * mm, y, f"Berilgan sanasi: {date}")
 
-    c.setFont("Helvetica", 10)
+    c.setFont("Helvetica", 12)
     c.drawString(width - 60 * mm, y, f"Direktor: {director}")
 
     c.showPage()
