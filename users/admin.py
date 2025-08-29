@@ -2,10 +2,18 @@ from django.contrib import admin
 from unfold.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import Group as UserGroup
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
 
 from .models import User, Transaction, Group
+
+admin.site.unregister(UserGroup)
+
+
+@admin.register(UserGroup)
+class GroupModelAdmin(ModelAdmin):
+    list_display = ["name"]
 
 
 @admin.register(Token)
@@ -52,6 +60,8 @@ class UserModelAdmin(UserAdmin, ModelAdmin):
                     "last_name",
                     "password1",
                     "password2",
+                    "groups",
+                    "is_staff"
                 )
             },
         ),

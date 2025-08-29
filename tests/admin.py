@@ -55,6 +55,19 @@ class TestModelAdmin(ModelAdmin):
         }
     }
 
+    exclude = ("author", )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+    
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Block)
 class BlockModelAdmin(ModelAdmin):
@@ -62,6 +75,19 @@ class BlockModelAdmin(ModelAdmin):
         "name",
         "subject",
     ]
+    
+    exclude = ("author", )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+    
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Dtm)
@@ -72,6 +98,19 @@ class DtmModelAdmin(ModelAdmin):
         "started",
         "ended",
     ]
+    
+    exclude = ("author", "participants", )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+    
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Subject)
@@ -86,6 +125,18 @@ class CefrModelAdmin(ModelAdmin):
         "subject",
         "is_public",
     ]
+    exclude = ("author", "participants", )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+    
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Question)
@@ -95,6 +146,19 @@ class QuestionModelAdmin(ModelAdmin):
         "type",
     ]
     inlines = [QuestionAnswerInline]
+    
+    exclude = ("author", )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+    
+    def save_model(self, request, obj, form, change):
+        if not change or not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Banner)

@@ -60,7 +60,8 @@ class Subject(models.Model):
 
 
 class Dtm(models.Model):
-    uuid = models.UUIDField(default=uuid4)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    uuid = models.UUIDField(default=uuid4, editable=False)
     name = models.CharField(max_length=100)
     participants = models.ManyToManyField(
         User, related_name="dtm_participants", blank=True
@@ -82,6 +83,8 @@ class Dtm(models.Model):
 
 
 class Block(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     dtm = models.ForeignKey(Dtm, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
@@ -96,6 +99,7 @@ class Block(models.Model):
 
 
 class Test(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.TextField()
     image = models.ImageField(upload_to="images/tests", null=True, blank=True)
     type = models.CharField(max_length=10, choices=TEST_TYPE)
@@ -110,6 +114,7 @@ class Test(models.Model):
 
 
 class Answer(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     value_1 = models.TextField()
     value_2 = models.TextField(null=True, blank=True)
@@ -126,7 +131,8 @@ class Answer(models.Model):
 
 # cefr
 class Cefr(models.Model):
-    uuid = models.UUIDField(default=uuid4)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    uuid = models.UUIDField(default=uuid4, editable=False)
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     price = models.IntegerField(default=0)
@@ -150,6 +156,7 @@ class Cefr(models.Model):
 
 
 class Question(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.TextField()
     image = models.ImageField(upload_to="images/tests", null=True, blank=True)
     type = models.CharField(max_length=10, choices=TEST_TYPE)
@@ -164,6 +171,7 @@ class Question(models.Model):
 
 
 class QuestionAnswer(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     value_1 = models.TextField()
     value_2 = models.TextField(null=True, blank=True)
