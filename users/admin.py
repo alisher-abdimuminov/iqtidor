@@ -95,7 +95,7 @@ class UserModelAdmin(UserAdmin, ModelAdmin):
                     "phone",
                     "first_name",
                     "last_name",
-                    "group",
+                    "groups",
                 )
             },
         ),
