@@ -170,7 +170,6 @@ class Question(models.Model):
 
 
 class QuestionAnswer(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     value_1 = models.TextField()
     value_2 = models.TextField(null=True, blank=True)
